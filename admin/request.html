@@ -1,0 +1,665 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+
+    <meta charset="UTF-8">
+
+    <meta
+        name="viewport"
+        content="width=device-width, initial-scale=1.0"
+    >
+
+    <title>Borrow Requests - Inventory System</title>
+
+    <link
+        rel="stylesheet"
+        href="../assets/css/style.css"
+    >
+
+    <style>
+
+        .content-card {
+            background: white;
+            border: 1px solid #e4ebe6;
+            border-radius: 14px;
+            padding: 25px;
+        }
+
+        .status {
+            display: inline-block;
+            padding: 5px 10px;
+            border-radius: 20px;
+            font-size: 12px;
+            font-weight: 600;
+        }
+
+        .status-pending {
+            background: #fff3cd;
+            color: #856404;
+        }
+
+        .status-approved {
+            background: #d1e7dd;
+            color: #0f5132;
+        }
+
+        .status-rejected {
+            background: #f8d7da;
+            color: #842029;
+        }
+
+        .btn {
+            border: none;
+            border-radius: 7px;
+            padding: 8px 12px;
+            cursor: pointer;
+            font-weight: 600;
+            font-size: 13px;
+            margin: 2px;
+        }
+
+        .btn-approve {
+            background: #198754;
+            color: white;
+        }
+
+        .btn-approve:hover {
+            background: #146c43;
+        }
+
+        .btn-reject {
+            background: #dc3545;
+            color: white;
+        }
+
+        .btn-reject:hover {
+            background: #b02a37;
+        }
+
+        .empty-message {
+            text-align: center;
+            padding: 30px;
+            color: #718078;
+        }
+
+    </style>
+
+</head>
+
+
+<body>
+
+
+<div class="app-layout">
+
+
+    <!-- SIDEBAR -->
+
+    <aside class="sidebar">
+
+        <div class="sidebar-logo">
+
+            <div class="logo-icon">
+                📦
+            </div>
+
+            <div>
+
+                <h2>
+                    Inventory
+                </h2>
+
+                <p>
+                    Management System
+                </p>
+
+            </div>
+
+        </div>
+
+
+        <nav>
+
+            <a href="dashboard.html">
+                📊 Dashboard
+            </a>
+
+            <a href="inventory.html">
+                📦 Inventory
+            </a>
+
+            <a href="borrowers.html">
+                👥 Borrowers
+            </a>
+
+            <a href="departments.html">
+                🏢 Departments
+            </a>
+
+            <a href="../qr/generate.html">
+                🔳 QR Codes
+            </a>
+
+            <a href="../qr/scan.html">
+                📷 QR Scanner
+            </a>
+
+            <a href="transactions.html">
+                📋 Transactions
+            </a>
+
+            <a href="requests.html">
+                📥 Borrow Requests
+            </a>
+
+            <a
+                href="../index.html"
+                onclick="logout()"
+            >
+                🚪 Logout
+            </a>
+
+        </nav>
+
+    </aside>
+
+
+    <!-- MAIN -->
+
+    <main class="main-content">
+
+
+        <div class="page-header">
+
+            <div>
+
+                <h1>
+                    Borrow Requests
+                </h1>
+
+                <p>
+                    Review and manage borrowing requests.
+                </p>
+
+            </div>
+
+        </div>
+
+
+        <div class="content-card">
+
+            <h2 style="margin-bottom:20px;">
+                Pending & Recent Requests
+            </h2>
+
+
+            <div class="table-container">
+
+                <table class="data-table">
+
+                    <thead>
+
+                        <tr>
+
+                            <th>
+                                Request ID
+                            </th>
+
+                            <th>
+                                Item
+                            </th>
+
+                            <th>
+                                Borrower
+                            </th>
+
+                            <th>
+                                Request Date
+                            </th>
+
+                            <th>
+                                Status
+                            </th>
+
+                            <th>
+                                Action
+                            </th>
+
+                        </tr>
+
+                    </thead>
+
+
+                    <tbody id="requestsTable">
+
+                    </tbody>
+
+                </table>
+
+            </div>
+
+        </div>
+
+
+    </main>
+
+</div>
+
+
+<script>
+
+/* =====================================
+   ADMIN LOGIN CHECK
+===================================== */
+
+const user =
+    JSON.parse(
+        localStorage.getItem("inventoryUser")
+    );
+
+
+if (
+    !user ||
+    user.role !== "admin"
+) {
+
+    window.location.href =
+        "../index.html";
+
+}
+
+
+/* =====================================
+   LOAD DATA
+===================================== */
+
+let requests =
+    JSON.parse(
+        localStorage.getItem(
+            "borrowRequests"
+        )
+    ) || [];
+
+
+let items =
+    JSON.parse(
+        localStorage.getItem(
+            "inventoryItems"
+        )
+    ) || [];
+
+
+const table =
+    document.getElementById(
+        "requestsTable"
+    );
+
+
+/* =====================================
+   DISPLAY REQUESTS
+===================================== */
+
+function displayRequests() {
+
+    table.innerHTML = "";
+
+
+    if (requests.length === 0) {
+
+        table.innerHTML = `
+
+            <tr>
+
+                <td
+                    colspan="6"
+                    class="empty-message"
+                >
+
+                    No borrow requests yet.
+
+                </td>
+
+            </tr>
+
+        `;
+
+        return;
+
+    }
+
+
+    requests.forEach(
+        function(request, index) {
+
+
+            let statusClass =
+                "status-pending";
+
+
+            if (
+                request.status ===
+                "Approved"
+            ) {
+
+                statusClass =
+                    "status-approved";
+
+            }
+
+
+            if (
+                request.status ===
+                "Rejected"
+            ) {
+
+                statusClass =
+                    "status-rejected";
+
+            }
+
+
+            const date =
+                new Date(
+                    request.requestDate
+                ).toLocaleString();
+
+
+            let action = "";
+
+
+            if (
+                request.status ===
+                "Pending"
+            ) {
+
+                action = `
+
+                    <button
+                        class="btn btn-approve"
+                        onclick="approveRequest(${index})"
+                    >
+                        Approve
+                    </button>
+
+                    <button
+                        class="btn btn-reject"
+                        onclick="rejectRequest(${index})"
+                    >
+                        Reject
+                    </button>
+
+                `;
+
+            }
+
+            else {
+
+                action =
+                    "<span>Completed</span>";
+
+            }
+
+
+            table.innerHTML += `
+
+                <tr>
+
+                    <td>
+                        ${request.id}
+                    </td>
+
+                    <td>
+
+                        <strong>
+                            ${request.itemName}
+                        </strong>
+
+                        <br>
+
+                        <small>
+                            ${request.itemId}
+                        </small>
+
+                    </td>
+
+                    <td>
+
+                        ${request.borrowerName}
+
+                        <br>
+
+                        <small>
+                            ${request.username}
+                        </small>
+
+                    </td>
+
+                    <td>
+                        ${date}
+                    </td>
+
+                    <td>
+
+                        <span
+                            class="status ${statusClass}"
+                        >
+                            ${request.status}
+                        </span>
+
+                    </td>
+
+                    <td>
+                        ${action}
+                    </td>
+
+                </tr>
+
+            `;
+
+        }
+    );
+
+}
+
+
+/* =====================================
+   APPROVE REQUEST
+===================================== */
+
+function approveRequest(index) {
+
+    const request =
+        requests[index];
+
+
+    if (!request) {
+
+        return;
+
+    }
+
+
+    const itemIndex =
+        items.findIndex(
+            item =>
+                item.id ===
+                request.itemId
+        );
+
+
+    if (itemIndex === -1) {
+
+        alert(
+            "The inventory item could not be found."
+        );
+
+        return;
+
+    }
+
+
+    const item =
+        items[itemIndex];
+
+
+    if (
+        item.status !==
+        "Available"
+    ) {
+
+        alert(
+            "This item is no longer available."
+        );
+
+        return;
+
+    }
+
+
+    if (
+        !confirm(
+            "Approve this borrowing request?"
+        )
+    ) {
+
+        return;
+
+    }
+
+
+    /*
+       Change request status
+    */
+
+    request.status =
+        "Approved";
+
+
+    request.approvedDate =
+        new Date().toISOString();
+
+
+    request.approvedBy =
+        user.username;
+
+
+    /*
+       Change item status
+    */
+
+    item.status =
+        "Borrowed";
+
+
+    /*
+       Save inventory
+    */
+
+    localStorage.setItem(
+        "inventoryItems",
+        JSON.stringify(items)
+    );
+
+
+    /*
+       Save requests
+    */
+
+    localStorage.setItem(
+        "borrowRequests",
+        JSON.stringify(requests)
+    );
+
+
+    displayRequests();
+
+
+    alert(
+        "Borrow request approved."
+    );
+
+}
+
+
+/* =====================================
+   REJECT REQUEST
+===================================== */
+
+function rejectRequest(index) {
+
+    const request =
+        requests[index];
+
+
+    if (!request) {
+
+        return;
+
+    }
+
+
+    if (
+        !confirm(
+            "Reject this borrowing request?"
+        )
+    ) {
+
+        return;
+
+    }
+
+
+    request.status =
+        "Rejected";
+
+
+    request.rejectedDate =
+        new Date().toISOString();
+
+
+    request.rejectedBy =
+        user.username;
+
+
+    localStorage.setItem(
+        "borrowRequests",
+        JSON.stringify(requests)
+    );
+
+
+    displayRequests();
+
+
+    alert(
+        "Borrow request rejected."
+    );
+
+}
+
+
+/* =====================================
+   LOGOUT
+===================================== */
+
+function logout() {
+
+    localStorage.removeItem(
+        "inventoryUser"
+    );
+
+}
+
+
+/* =====================================
+   START
+===================================== */
+
+displayRequests();
+
+</script>
+
+
+</body>
+
+</html>
