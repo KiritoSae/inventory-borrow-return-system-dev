@@ -1,223 +1,57 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
+
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <meta
+        name="viewport"
+        content="width=device-width, initial-scale=1.0"
+    >
 
     <title>Admin Dashboard - Inventory System</title>
 
-    <style>
-        * {
-            box-sizing: border-box;
-            margin: 0;
-            padding: 0;
-        }
+    <link
+        rel="stylesheet"
+        href="../assets/css/style.css"
+    >
 
-        body {
-            font-family: Arial, sans-serif;
-            background: #f3f6f4;
-            color: #26332b;
-        }
-
-        .layout {
-            display: flex;
-            min-height: 100vh;
-        }
-
-        /* SIDEBAR */
-
-        .sidebar {
-            width: 250px;
-            background: #17452c;
-            color: white;
-            padding: 25px 15px;
-        }
-
-        .brand {
-            text-align: center;
-            margin-bottom: 30px;
-        }
-
-        .brand-icon {
-            font-size: 40px;
-        }
-
-        .brand h2 {
-            margin-top: 8px;
-        }
-
-        .brand p {
-            font-size: 12px;
-            opacity: 0.75;
-            margin-top: 4px;
-        }
-
-        .nav a {
-            display: block;
-            color: white;
-            text-decoration: none;
-            padding: 13px 15px;
-            margin-bottom: 5px;
-            border-radius: 8px;
-        }
-
-        .nav a:hover,
-        .nav a.active {
-            background: #28613e;
-        }
-
-        .logout {
-            margin-top: 25px;
-            background: #8b2635;
-        }
-
-        /* MAIN */
-
-        .main {
-            flex: 1;
-            padding: 30px;
-        }
-
-        .page-header {
-            margin-bottom: 25px;
-        }
-
-        .page-header h1 {
-            font-size: 28px;
-            margin-bottom: 7px;
-        }
-
-        .page-header p {
-            color: #6b756e;
-        }
-
-        /* CARDS */
-
-        .cards {
-            display: grid;
-            grid-template-columns:
-                repeat(auto-fit, minmax(200px, 1fr));
-
-            gap: 18px;
-            margin-bottom: 25px;
-        }
-
-        .card {
-            background: white;
-            padding: 22px;
-            border-radius: 12px;
-            box-shadow: 0 4px 15px rgba(0,0,0,0.05);
-        }
-
-        .card-title {
-            color: #68736c;
-            font-size: 14px;
-            margin-bottom: 10px;
-        }
-
-        .number {
-            font-size: 32px;
-            font-weight: bold;
-            color: #198754;
-        }
-
-        /* TABLE */
-
-        .panel {
-            background: white;
-            border-radius: 12px;
-            padding: 25px;
-            box-shadow: 0 4px 15px rgba(0,0,0,0.05);
-        }
-
-        .panel h2 {
-            margin-bottom: 20px;
-        }
-
-        table {
-            width: 100%;
-            border-collapse: collapse;
-        }
-
-        th,
-        td {
-            padding: 13px;
-            text-align: left;
-            border-bottom: 1px solid #e5e9e6;
-        }
-
-        th {
-            font-size: 13px;
-            color: #66716a;
-        }
-
-        .empty {
-            text-align: center;
-            padding: 25px;
-            color: #777;
-        }
-
-        /* MOBILE */
-
-        @media (max-width: 700px) {
-
-            .layout {
-                display: block;
-            }
-
-            .sidebar {
-                width: 100%;
-            }
-
-            .nav {
-                display: grid;
-                grid-template-columns: 1fr 1fr;
-                gap: 5px;
-            }
-
-            .logout {
-                margin-top: 5px;
-            }
-
-            .main {
-                padding: 20px;
-            }
-
-            table {
-                font-size: 13px;
-            }
-
-        }
-    </style>
 </head>
 
 <body>
 
-<div class="layout">
+<div class="app-layout">
+
 
     <!-- SIDEBAR -->
 
     <aside class="sidebar">
 
-        <div class="brand">
+        <div class="sidebar-logo">
 
-            <div class="brand-icon">
+            <div class="logo-icon">
                 📦
             </div>
 
-            <h2>Inventory</h2>
+            <div>
 
-            <p>Administrator</p>
+                <h2>
+                    Inventory
+                </h2>
+
+                <p>
+                    Management System
+                </p>
+
+            </div>
 
         </div>
 
 
-        <nav class="nav">
+        <nav>
 
-            <a
-                href="dashboard.html"
-                class="active"
-            >
+            <a href="dashboard.html">
                 📊 Dashboard
             </a>
 
@@ -233,17 +67,16 @@
                 🏢 Departments
             </a>
 
-            <a href="transactions.html">
-                🔄 Transactions
+            <a href="../qr/scan.html">
+                📷 QR Scanner
             </a>
 
-            <a href="../qr/">
-                📷 QR Scanner
+            <a href="transactions.html">
+                📋 Transactions
             </a>
 
             <a
                 href="../index.html"
-                class="logout"
                 onclick="logout()"
             >
                 🚪 Logout
@@ -256,30 +89,39 @@
 
     <!-- MAIN CONTENT -->
 
-    <main class="main">
+    <main class="main-content">
+
 
         <div class="page-header">
 
-            <h1>
-                Admin Dashboard
-            </h1>
+            <div>
 
-            <p>
-                Welcome back, Administrator.
-            </p>
+                <h1>
+                    Dashboard
+                </h1>
+
+                <p>
+                    Welcome back,
+                    <span id="adminName">
+                        Administrator
+                    </span>.
+                </p>
+
+            </div>
 
         </div>
 
 
         <!-- DASHBOARD CARDS -->
 
-        <div class="cards">
+        <div class="dashboard-cards">
 
-            <div class="card">
 
-                <div class="card-title">
+            <div class="dashboard-card">
+
+                <h3>
                     Total Items
-                </div>
+                </h3>
 
                 <div
                     class="number"
@@ -291,11 +133,11 @@
             </div>
 
 
-            <div class="card">
+            <div class="dashboard-card success">
 
-                <div class="card-title">
-                    Available Items
-                </div>
+                <h3>
+                    Available
+                </h3>
 
                 <div
                     class="number"
@@ -307,11 +149,11 @@
             </div>
 
 
-            <div class="card">
+            <div class="dashboard-card">
 
-                <div class="card-title">
-                    Borrowed Items
-                </div>
+                <h3>
+                    Borrowed
+                </h3>
 
                 <div
                     class="number"
@@ -323,40 +165,37 @@
             </div>
 
 
-            <div class="card">
+            <div class="dashboard-card warning">
 
-                <div class="card-title">
-                    Pending Requests
-                </div>
+                <h3>
+                    Overdue
+                </h3>
 
                 <div
                     class="number"
-                    id="pendingRequests"
+                    id="overdueItems"
                 >
                     0
                 </div>
 
             </div>
 
+
         </div>
 
 
         <!-- RECENT TRANSACTIONS -->
 
-        <div class="panel">
+        <div class="table-container">
 
-            <h2>
-                Recent Transactions
-            </h2>
-
-            <table>
+            <table class="data-table">
 
                 <thead>
 
                     <tr>
 
                         <th>
-                            Date
+                            Recent Transaction
                         </th>
 
                         <th>
@@ -368,21 +207,19 @@
                         </th>
 
                         <th>
-                            Action
+                            Status
                         </th>
 
                     </tr>
 
                 </thead>
 
+
                 <tbody id="transactionTable">
 
                     <tr>
 
-                        <td
-                            colspan="4"
-                            class="empty"
-                        >
+                        <td colspan="4">
                             No transactions yet.
                         </td>
 
@@ -394,6 +231,7 @@
 
         </div>
 
+
     </main>
 
 </div>
@@ -401,7 +239,11 @@
 
 <script>
 
-/* CHECK LOGIN */
+/*
+|--------------------------------------------------------------------------
+| CHECK LOGIN
+|--------------------------------------------------------------------------
+*/
 
 const user =
     JSON.parse(
@@ -409,10 +251,7 @@ const user =
     );
 
 
-if (
-    !user ||
-    user.role !== "admin"
-) {
+if (!user) {
 
     window.location.href =
         "../index.html";
@@ -420,7 +259,97 @@ if (
 }
 
 
-/* LOGOUT */
+/*
+|--------------------------------------------------------------------------
+| CHECK ADMIN
+|--------------------------------------------------------------------------
+*/
+
+if (
+    user &&
+    user.role !== "admin"
+) {
+
+    window.location.href =
+        "../user/dashboard.html";
+
+}
+
+
+/*
+|--------------------------------------------------------------------------
+| DISPLAY USER NAME
+|--------------------------------------------------------------------------
+*/
+
+if (user) {
+
+    document.getElementById(
+        "adminName"
+    ).textContent = user.name;
+
+}
+
+
+/*
+|--------------------------------------------------------------------------
+| LOAD INVENTORY
+|--------------------------------------------------------------------------
+*/
+
+const items =
+    JSON.parse(
+        localStorage.getItem("inventoryItems")
+    ) || [];
+
+
+const totalItems =
+    items.length;
+
+
+const availableItems =
+    items.filter(
+        item => item.status === "Available"
+    ).length;
+
+
+const borrowedItems =
+    items.filter(
+        item => item.status === "Borrowed"
+    ).length;
+
+
+const overdueItems =
+    items.filter(
+        item => item.status === "Overdue"
+    ).length;
+
+
+document.getElementById(
+    "totalItems"
+).textContent = totalItems;
+
+
+document.getElementById(
+    "availableItems"
+).textContent = availableItems;
+
+
+document.getElementById(
+    "borrowedItems"
+).textContent = borrowedItems;
+
+
+document.getElementById(
+    "overdueItems"
+).textContent = overdueItems;
+
+
+/*
+|--------------------------------------------------------------------------
+| LOGOUT
+|--------------------------------------------------------------------------
+*/
 
 function logout() {
 
@@ -430,65 +359,8 @@ function logout() {
 
 }
 
-
-/* LOAD INVENTORY */
-
-const items =
-    JSON.parse(
-        localStorage.getItem("inventoryItems")
-    ) || [];
-
-
-const total =
-    items.length;
-
-
-const available =
-    items.filter(
-        item => item.status === "Available"
-    ).length;
-
-
-const borrowed =
-    items.filter(
-        item => item.status === "Borrowed"
-    ).length;
-
-
-document.getElementById(
-    "totalItems"
-).textContent = total;
-
-
-document.getElementById(
-    "availableItems"
-).textContent = available;
-
-
-document.getElementById(
-    "borrowedItems"
-).textContent = borrowed;
-
-
-/* LOAD REQUESTS */
-
-const requests =
-    JSON.parse(
-        localStorage.getItem("borrowRequests")
-    ) || [];
-
-
-const pending =
-    requests.filter(
-        request => request.status === "Pending"
-    ).length;
-
-
-document.getElementById(
-    "pendingRequests"
-).textContent = pending;
-
 </script>
 
 </body>
+
 </html>
