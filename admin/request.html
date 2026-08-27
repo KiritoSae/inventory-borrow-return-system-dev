@@ -83,6 +83,12 @@
             color: #718078;
         }
 
+        .due-date {
+            margin-top: 5px;
+            color: #536158;
+            font-size: 12px;
+        }
+
     </style>
 
 </head>
@@ -219,6 +225,10 @@
                             </th>
 
                             <th>
+                                Due Date
+                            </th>
+
+                            <th>
                                 Status
                             </th>
 
@@ -290,6 +300,14 @@ let items =
     ) || [];
 
 
+let transactions =
+    JSON.parse(
+        localStorage.getItem(
+            "transactions"
+        )
+    ) || [];
+
+
 const table =
     document.getElementById(
         "requestsTable"
@@ -312,7 +330,7 @@ function displayRequests() {
             <tr>
 
                 <td
-                    colspan="6"
+                    colspan="7"
                     class="empty-message"
                 >
 
@@ -360,9 +378,20 @@ function displayRequests() {
 
 
             const date =
-                new Date(
-                    request.requestDate
-                ).toLocaleString();
+                request.requestDate
+                    ? new Date(
+                        request.requestDate
+                    ).toLocaleString()
+                    : "-";
+
+
+            const dueDate =
+                request.dueDate
+                    ? new Date(
+                        request.dueDate +
+                        "T00:00:00"
+                    ).toLocaleDateString()
+                    : "—";
 
 
             let action = "";
@@ -409,6 +438,7 @@ function displayRequests() {
                         ${request.id}
                     </td>
 
+
                     <td>
 
                         <strong>
@@ -423,6 +453,7 @@ function displayRequests() {
 
                     </td>
 
+
                     <td>
 
                         ${request.borrowerName}
@@ -435,9 +466,18 @@ function displayRequests() {
 
                     </td>
 
+
                     <td>
                         ${date}
                     </td>
+
+
+                    <td>
+
+                        ${dueDate}
+
+                    </td>
+
 
                     <td>
 
@@ -448,6 +488,7 @@ function displayRequests() {
                         </span>
 
                     </td>
+
 
                     <td>
                         ${action}
@@ -482,9 +523,14 @@ function approveRequest(index) {
 
     const itemIndex =
         items.findIndex(
-            item =>
-                item.id ===
-                request.itemId
+            function(item) {
+
+                return (
+                    item.id ===
+                    request.itemId
+                );
+
+            }
         );
 
 
@@ -517,20 +563,127 @@ function approveRequest(index) {
     }
 
 
-    if (
-        !confirm(
-            "Approve this borrowing request?"
-        )
-    ) {
+    /* =================================
+       SELECT DUE DATE
+    ================================= */
+
+    const dueDate =
+        prompt(
+            "Enter the due date.\n\n" +
+            "Use this format:\n" +
+            "YYYY-MM-DD\n\n" +
+            "Example:\n" +
+            "2026-09-01"
+        );
+
+
+    if (!dueDate) {
 
         return;
 
     }
 
 
-    /*
-       Change request status
-    */
+    /* =================================
+       VALIDATE DATE
+    ================================= */
+
+    const datePattern =
+        /^\d{4}-\d{2}-\d{2}$/;
+
+
+    if (
+        !datePattern.test(
+            dueDate
+        )
+    ) {
+
+        alert(
+            "Invalid date format.\n\n" +
+            "Please use YYYY-MM-DD."
+        );
+
+        return;
+
+    }
+
+
+    const selectedDate =
+        new Date(
+            dueDate +
+            "T23:59:59"
+        );
+
+
+    if (
+        isNaN(
+            selectedDate.getTime()
+        )
+    ) {
+
+        alert(
+            "Invalid due date."
+        );
+
+        return;
+
+    }
+
+
+    const today =
+        new Date();
+
+
+    today.setHours(
+        0,
+        0,
+        0,
+        0
+    );
+
+
+    if (
+        selectedDate <
+        today
+    ) {
+
+        alert(
+            "The due date cannot be in the past."
+        );
+
+        return;
+
+    }
+
+
+    /* =================================
+       CONFIRM APPROVAL
+    ================================= */
+
+    const confirmed =
+        confirm(
+            "Approve this borrowing request?\n\n" +
+            "Item: " +
+            request.itemName +
+            "\n" +
+            "Borrower: " +
+            request.borrowerName +
+            "\n" +
+            "Due date: " +
+            dueDate
+        );
+
+
+    if (!confirmed) {
+
+        return;
+
+    }
+
+
+    /* =================================
+       UPDATE REQUEST
+    ================================= */
 
     request.status =
         "Approved";
@@ -544,31 +697,105 @@ function approveRequest(index) {
         user.username;
 
 
-    /*
-       Change item status
-    */
+    request.dueDate =
+        dueDate;
+
+
+    /* =================================
+       UPDATE INVENTORY
+    ================================= */
 
     item.status =
         "Borrowed";
 
 
-    /*
-       Save inventory
-    */
+    /* =================================
+       CREATE TRANSACTION
+    ================================= */
+
+    const existingTransaction =
+        transactions.find(
+            function(transaction) {
+
+                return (
+                    transaction.requestId ===
+                    request.id
+                );
+
+            }
+        );
+
+
+    if (!existingTransaction) {
+
+        const transaction = {
+
+            id:
+                "TRX-" +
+                Date.now(),
+
+            requestId:
+                request.id,
+
+            itemId:
+                request.itemId,
+
+            itemName:
+                request.itemName,
+
+            borrowerName:
+                request.borrowerName,
+
+            username:
+                request.username,
+
+            borrowedDate:
+                request.approvedDate,
+
+            dueDate:
+                request.dueDate,
+
+            returnDate:
+                null,
+
+            status:
+                "Borrowed"
+
+        };
+
+
+        transactions.push(
+            transaction
+        );
+
+    }
+
+
+    /* =================================
+       SAVE EVERYTHING
+    ================================= */
 
     localStorage.setItem(
         "inventoryItems",
-        JSON.stringify(items)
+        JSON.stringify(
+            items
+        )
     );
 
 
-    /*
-       Save requests
-    */
-
     localStorage.setItem(
         "borrowRequests",
-        JSON.stringify(requests)
+        JSON.stringify(
+            requests
+        )
+    );
+
+
+    localStorage.setItem(
+        "transactions",
+        JSON.stringify(
+            transactions
+        )
     );
 
 
@@ -576,7 +803,9 @@ function approveRequest(index) {
 
 
     alert(
-        "Borrow request approved."
+        "Borrow request approved.\n\n" +
+        "Due date: " +
+        dueDate
     );
 
 }
@@ -624,7 +853,9 @@ function rejectRequest(index) {
 
     localStorage.setItem(
         "borrowRequests",
-        JSON.stringify(requests)
+        JSON.stringify(
+            requests
+        )
     );
 
 
