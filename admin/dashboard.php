@@ -2,7 +2,7 @@
 
 require_once __DIR__ . '/../includes/auth.php';
 
-requireLogin();
+requireAdmin();
 
 require_once __DIR__ . '/../config/database.php';
 
