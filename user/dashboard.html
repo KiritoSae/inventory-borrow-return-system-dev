@@ -1,1 +1,345 @@
+<!DOCTYPE html>
+<html lang="en">
 
+<head>
+
+    <meta charset="UTF-8">
+
+    <meta
+        name="viewport"
+        content="width=device-width, initial-scale=1.0"
+    >
+
+    <title>User Dashboard</title>
+
+    <style>
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            font-family: Arial, sans-serif;
+            background: #f1f5f2;
+            color: #26332b;
+        }
+
+        .layout {
+            display: flex;
+            min-height: 100vh;
+        }
+
+        .sidebar {
+            width: 240px;
+            background: #163b29;
+            color: white;
+            padding: 25px 15px;
+        }
+
+        .brand {
+            text-align: center;
+            margin-bottom: 30px;
+        }
+
+        .brand-icon {
+            font-size: 35px;
+        }
+
+        .brand h2 {
+            margin-top: 8px;
+        }
+
+        .brand p {
+            font-size: 12px;
+            opacity: .7;
+        }
+
+        .nav a {
+            display: block;
+            color: white;
+            text-decoration: none;
+            padding: 13px;
+            border-radius: 8px;
+            margin-bottom: 5px;
+        }
+
+        .nav a:hover {
+            background: #24563b;
+        }
+
+        .logout {
+            margin-top: 25px !important;
+            background: #8b2635;
+        }
+
+        .main {
+            flex: 1;
+            padding: 30px;
+        }
+
+        .header {
+            margin-bottom: 25px;
+        }
+
+        .header p {
+            color: #6d786f;
+        }
+
+        .scan-box {
+            background: #198754;
+            color: white;
+            padding: 30px;
+            border-radius: 15px;
+            margin-bottom: 25px;
+        }
+
+        .scan-box h2 {
+            margin-bottom: 10px;
+        }
+
+        .scan-button {
+            display: inline-block;
+            margin-top: 15px;
+            padding: 13px 20px;
+            background: white;
+            color: #198754;
+            text-decoration: none;
+            border-radius: 8px;
+            font-weight: bold;
+        }
+
+        .cards {
+            display: grid;
+            grid-template-columns:
+                repeat(auto-fit, minmax(190px, 1fr));
+
+            gap: 18px;
+        }
+
+        .card {
+            background: white;
+            padding: 22px;
+            border-radius: 12px;
+        }
+
+        .card h3 {
+            font-size: 14px;
+            color: #68746c;
+        }
+
+        .number {
+            font-size: 32px;
+            font-weight: bold;
+            margin-top: 10px;
+            color: #198754;
+        }
+
+        @media(max-width:700px) {
+
+            .layout {
+                display: block;
+            }
+
+            .sidebar {
+                width: 100%;
+            }
+
+            .nav {
+                display: grid;
+                grid-template-columns: 1fr 1fr;
+            }
+
+            .main {
+                padding: 20px;
+            }
+
+        }
+
+    </style>
+
+</head>
+
+
+<body>
+
+
+<div class="layout">
+
+
+    <aside class="sidebar">
+
+        <div class="brand">
+
+            <div class="brand-icon">
+                📦
+            </div>
+
+            <h2>Inventory</h2>
+
+            <p>User Panel</p>
+
+        </div>
+
+
+        <nav class="nav">
+
+            <a href="dashboard.html">
+                📊 Dashboard
+            </a>
+
+            <a href="scan.html">
+                📷 Scan QR Code
+            </a>
+
+            <a href="borrowed.html">
+                📦 My Borrowed Items
+            </a>
+
+            <a href="history.html">
+                📋 Transaction History
+            </a>
+
+            <a
+                href="../index.html"
+                class="logout"
+                onclick="logout()"
+            >
+                🚪 Logout
+            </a>
+
+        </nav>
+
+    </aside>
+
+
+    <main class="main">
+
+
+        <div class="header">
+
+            <h1>
+                User Dashboard
+            </h1>
+
+            <p>
+                Welcome back,
+                <span id="userName">
+                    User
+                </span>.
+            </p>
+
+        </div>
+
+
+        <div class="scan-box">
+
+            <h2>
+                Need to borrow an item?
+            </h2>
+
+            <p>
+                Scan the QR code attached to the
+                inventory item.
+            </p>
+
+            <a
+                href="scan.html"
+                class="scan-button"
+            >
+                📷 Scan QR Code
+            </a>
+
+        </div>
+
+
+        <div class="cards">
+
+
+            <div class="card">
+
+                <h3>
+                    My Borrowed Items
+                </h3>
+
+                <div class="number">
+                    0
+                </div>
+
+            </div>
+
+
+            <div class="card">
+
+                <h3>
+                    Pending Requests
+                </h3>
+
+                <div class="number">
+                    0
+                </div>
+
+            </div>
+
+
+            <div class="card">
+
+                <h3>
+                    Transaction History
+                </h3>
+
+                <div class="number">
+                    0
+                </div>
+
+            </div>
+
+
+        </div>
+
+
+    </main>
+
+</div>
+
+
+<script>
+
+const user =
+    JSON.parse(
+        localStorage.getItem("inventoryUser")
+    );
+
+
+if (!user || user.role !== "user") {
+
+    window.location.href =
+        "../index.html";
+
+}
+
+
+if (user) {
+
+    document.getElementById(
+        "userName"
+    ).textContent = user.name;
+
+}
+
+
+function logout() {
+
+    localStorage.removeItem(
+        "inventoryUser"
+    );
+
+}
+
+</script>
+
+
+</body>
+
+</html>
