@@ -1,0 +1,498 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+
+    <meta charset="UTF-8">
+
+    <meta
+        name="viewport"
+        content="width=device-width, initial-scale=1.0"
+    >
+
+    <title>QR Codes - Inventory System</title>
+
+    <link
+        rel="stylesheet"
+        href="../assets/css/style.css"
+    >
+
+    <!-- QR CODE LIBRARY -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
+
+    <style>
+
+        .content-card {
+            background: white;
+            border: 1px solid #e4ebe6;
+            border-radius: 14px;
+            padding: 25px;
+        }
+
+        .qr-grid {
+            display: grid;
+            grid-template-columns:
+                repeat(auto-fill, minmax(230px, 1fr));
+
+            gap: 20px;
+            margin-top: 20px;
+        }
+
+        .qr-card {
+            background: white;
+            border: 1px solid #e4ebe6;
+            border-radius: 12px;
+            padding: 20px;
+            text-align: center;
+        }
+
+        .qr-code {
+            display: flex;
+            justify-content: center;
+            margin: 15px 0;
+        }
+
+        .item-id {
+            font-weight: bold;
+            color: #198754;
+            margin-bottom: 5px;
+        }
+
+        .item-name {
+            font-size: 16px;
+            font-weight: bold;
+            margin-bottom: 5px;
+        }
+
+        .item-info {
+            font-size: 13px;
+            color: #718078;
+        }
+
+        .btn {
+            border: none;
+            border-radius: 8px;
+            padding: 10px 15px;
+            cursor: pointer;
+            font-weight: 600;
+            margin-top: 10px;
+        }
+
+        .btn-primary {
+            background: #198754;
+            color: white;
+        }
+
+        .btn-primary:hover {
+            background: #146c43;
+        }
+
+        .empty {
+            padding: 30px;
+            text-align: center;
+            color: #777;
+        }
+
+    </style>
+
+</head>
+
+
+<body>
+
+
+<div class="app-layout">
+
+
+    <!-- SIDEBAR -->
+
+    <aside class="sidebar">
+
+        <div class="sidebar-logo">
+
+            <div class="logo-icon">
+                📦
+            </div>
+
+            <div>
+
+                <h2>
+                    Inventory
+                </h2>
+
+                <p>
+                    Management System
+                </p>
+
+            </div>
+
+        </div>
+
+
+        <nav>
+
+            <a href="../admin/dashboard.html">
+                📊 Dashboard
+            </a>
+
+            <a href="../admin/inventory.html">
+                📦 Inventory
+            </a>
+
+            <a href="../admin/borrowers.html">
+                👥 Borrowers
+            </a>
+
+            <a href="../admin/departments.html">
+                🏢 Departments
+            </a>
+
+            <a href="generate.html">
+                🔳 QR Codes
+            </a>
+
+            <a href="../admin/transactions.html">
+                📋 Transactions
+            </a>
+
+            <a href="scan.html">
+                📷 QR Scanner
+            </a>
+
+            <a
+                href="../index.html"
+                onclick="logout()"
+            >
+                🚪 Logout
+            </a>
+
+        </nav>
+
+    </aside>
+
+
+    <!-- MAIN -->
+
+    <main class="main-content">
+
+
+        <div class="page-header">
+
+            <div>
+
+                <h1>
+                    QR Codes
+                </h1>
+
+                <p>
+                    Generate QR codes for inventory items.
+                </p>
+
+            </div>
+
+        </div>
+
+
+        <div class="content-card">
+
+            <h2>
+                Inventory QR Codes
+            </h2>
+
+            <p style="margin-top:8px; color:#718078;">
+                Each inventory item has its own unique QR code.
+            </p>
+
+
+            <div
+                id="qrGrid"
+                class="qr-grid"
+            >
+
+            </div>
+
+        </div>
+
+
+    </main>
+
+</div>
+
+
+<script>
+
+/* ==============================
+   LOGIN CHECK
+============================== */
+
+const user =
+    JSON.parse(
+        localStorage.getItem("inventoryUser")
+    );
+
+
+if (
+    !user ||
+    user.role !== "admin"
+) {
+
+    window.location.href =
+        "../index.html";
+
+}
+
+
+/* ==============================
+   LOAD ITEMS
+============================== */
+
+const items =
+    JSON.parse(
+        localStorage.getItem("inventoryItems")
+    ) || [];
+
+
+const grid =
+    document.getElementById(
+        "qrGrid"
+    );
+
+
+/* ==============================
+   NO ITEMS
+============================== */
+
+if (items.length === 0) {
+
+    grid.innerHTML = `
+
+        <div class="empty">
+
+            No inventory items available.
+
+            <br><br>
+
+            Add items first from the
+            Inventory page.
+
+        </div>
+
+    `;
+
+}
+
+
+/* ==============================
+   CREATE QR CODES
+============================== */
+
+items.forEach(function(item) {
+
+
+    const card =
+        document.createElement("div");
+
+
+    card.className =
+        "qr-card";
+
+
+    card.innerHTML = `
+
+        <div class="item-id">
+            ${item.id}
+        </div>
+
+        <div class="item-name">
+            ${item.name}
+        </div>
+
+        <div class="item-info">
+            ${item.category}
+        </div>
+
+        <div
+            class="qr-code"
+            id="qr-${item.id}"
+        >
+        </div>
+
+        <div class="item-info">
+            Status: ${item.status}
+        </div>
+
+        <button
+            class="btn btn-primary"
+            onclick="printQR('${item.id}')"
+        >
+            🖨️ Print QR
+        </button>
+
+    `;
+
+
+    grid.appendChild(card);
+
+
+    new QRCode(
+
+        document.getElementById(
+            "qr-" + item.id
+        ),
+
+        {
+
+            text:
+                item.id,
+
+            width:
+                150,
+
+            height:
+                150
+
+        }
+
+    );
+
+});
+
+
+/* ==============================
+   PRINT QR
+============================== */
+
+function printQR(itemId) {
+
+    const item =
+        items.find(
+            item => item.id === itemId
+        );
+
+
+    if (!item) {
+        return;
+    }
+
+
+    const qrElement =
+        document.getElementById(
+            "qr-" + itemId
+        );
+
+
+    const qrImage =
+        qrElement.querySelector("img");
+
+
+    if (!qrImage) {
+
+        alert(
+            "QR code is still loading."
+        );
+
+        return;
+
+    }
+
+
+    const printWindow =
+        window.open(
+            "",
+            "_blank"
+        );
+
+
+    printWindow.document.write(`
+
+        <!DOCTYPE html>
+
+        <html>
+
+        <head>
+
+            <title>
+                QR - ${item.id}
+            </title>
+
+            <style>
+
+                body {
+                    font-family: Arial;
+                    text-align: center;
+                    padding: 40px;
+                }
+
+                img {
+                    width: 250px;
+                    height: 250px;
+                }
+
+                h2 {
+                    margin-bottom: 5px;
+                }
+
+                p {
+                    margin: 5px;
+                }
+
+            </style>
+
+        </head>
+
+        <body>
+
+            <h2>
+                ${item.name}
+            </h2>
+
+            <p>
+                Item ID: ${item.id}
+            </p>
+
+            <img
+                src="${qrImage.src}"
+            >
+
+            <p>
+                Scan this QR code to view
+                the inventory item.
+            </p>
+
+        </body>
+
+        </html>
+
+    `);
+
+
+    printWindow.document.close();
+
+
+    setTimeout(function() {
+
+        printWindow.print();
+
+    }, 500);
+
+}
+
+
+/* ==============================
+   LOGOUT
+============================== */
+
+function logout() {
+
+    localStorage.removeItem(
+        "inventoryUser"
+    );
+
+}
+
+</script>
+
+
+</body>
+
+</html>
