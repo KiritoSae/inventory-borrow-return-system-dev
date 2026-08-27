@@ -7,7 +7,7 @@ if (session_status() === PHP_SESSION_NONE) {
 
 /*
 |--------------------------------------------------------------------------
-| Check Login
+| Check if logged in
 |--------------------------------------------------------------------------
 */
 
@@ -27,8 +27,9 @@ function requireLogin(): void
 {
     if (!isLoggedIn()) {
 
-        header('Location: ../login.php');
+        header("Location: ../login.php");
         exit;
+
     }
 }
 
@@ -49,8 +50,10 @@ function isAdmin(): bool
         trim($_SESSION['role'] ?? '')
     );
 
-    return $role === 'admin'
-        || $role === 'administrator';
+    return (
+        $role === 'admin' ||
+        $role === 'administrator'
+    );
 }
 
 
@@ -66,8 +69,9 @@ function requireAdmin(): void
 
     if (!isAdmin()) {
 
-        header('Location: ../borrower/dashboard.php');
+        header("Location: ../borrower/dashboard.php");
         exit;
+
     }
 }
 
@@ -84,7 +88,8 @@ function requireBorrower(): void
 
     if (isAdmin()) {
 
-        header('Location: ../admin/dashboard.php');
+        header("Location: ../admin/dashboard.php");
         exit;
+
     }
 }
