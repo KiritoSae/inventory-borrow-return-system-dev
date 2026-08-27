@@ -1,251 +1,341 @@
 <!DOCTYPE html>
+
 <html lang="en">
 
 <head>
 
-    <meta charset="UTF-8">
+```
+<meta charset="UTF-8">
 
-    <meta
-        name="viewport"
-        content="width=device-width, initial-scale=1.0"
-    >
+<meta
+    name="viewport"
+    content="width=device-width, initial-scale=1.0"
+>
 
-    <title>Transactions - Inventory System</title>
+<title>Transaction History - Inventory System</title>
 
-    <link
-        rel="stylesheet"
-        href="../assets/css/style.css"
-    >
+<link
+    rel="stylesheet"
+    href="assets/css/style.css"
+>
 
-    <style>
+<style>
 
-        .content-card {
-            background: white;
-            border: 1px solid #e4ebe6;
-            border-radius: 14px;
-            padding: 25px;
+    .content-card {
+        background: white;
+        border: 1px solid #e5e7eb;
+        border-radius: 12px;
+        padding: 20px;
+        margin-top: 20px;
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+    }
+
+    .table-wrapper {
+        width: 100%;
+        overflow-x: auto;
+    }
+
+    .data-table {
+        width: 100%;
+        border-collapse: collapse;
+        min-width: 850px;
+    }
+
+    .data-table th,
+    .data-table td {
+        padding: 13px;
+        text-align: left;
+        border-bottom: 1px solid #e5e7eb;
+    }
+
+    .data-table th {
+        background: #f8fafc;
+        font-weight: 600;
+    }
+
+    .status {
+        display: inline-block;
+        padding: 5px 10px;
+        border-radius: 20px;
+        font-size: 13px;
+        font-weight: 600;
+    }
+
+    .status.borrowed {
+        background: #dbeafe;
+        color: #1d4ed8;
+    }
+
+    .status.returned {
+        background: #dcfce7;
+        color: #166534;
+    }
+
+    .status.overdue {
+        background: #fee2e2;
+        color: #991b1b;
+    }
+
+    .empty-message {
+        text-align: center;
+        padding: 40px;
+        color: #64748b;
+    }
+
+    .summary {
+        display: grid;
+        grid-template-columns: repeat(3, 1fr);
+        gap: 15px;
+        margin-bottom: 20px;
+    }
+
+    .summary-card {
+        background: #f8fafc;
+        border: 1px solid #e5e7eb;
+        border-radius: 10px;
+        padding: 18px;
+    }
+
+    .summary-card h3 {
+        margin: 0 0 8px;
+        font-size: 14px;
+        color: #64748b;
+    }
+
+    .summary-number {
+        font-size: 25px;
+        font-weight: bold;
+    }
+
+    @media (max-width: 700px) {
+
+        .summary {
+            grid-template-columns: 1fr;
         }
 
-        .status {
-            display: inline-block;
-            padding: 5px 10px;
-            border-radius: 20px;
-            font-size: 12px;
-            font-weight: 600;
-        }
+    }
 
-        .status-borrowed {
-            background: #fff3cd;
-            color: #856404;
-        }
-
-        .status-returned {
-            background: #d1e7dd;
-            color: #0f5132;
-        }
-
-        .status-overdue {
-            background: #f8d7da;
-            color: #842029;
-        }
-
-        .btn {
-            border: none;
-            border-radius: 7px;
-            padding: 8px 12px;
-            cursor: pointer;
-            font-weight: 600;
-            font-size: 13px;
-        }
-
-        .btn-return {
-            background: #198754;
-            color: white;
-        }
-
-        .btn-return:hover {
-            background: #146c43;
-        }
-
-        .empty-message {
-            text-align: center;
-            padding: 30px;
-            color: #718078;
-        }
-
-    </style>
+</style>
+```
 
 </head>
 
-
 <body>
-
 
 <div class="app-layout">
 
+```
+<!-- SIDEBAR -->
 
-    <!-- SIDEBAR -->
+<aside class="sidebar">
 
-    <aside class="sidebar">
+    <div class="sidebar-logo">
 
-        <div class="sidebar-logo">
-
-            <div class="logo-icon">
-                📦
-            </div>
-
-            <div>
-
-                <h2>
-                    Inventory
-                </h2>
-
-                <p>
-                    Management System
-                </p>
-
-            </div>
-
+        <div class="logo-icon">
+            📦
         </div>
 
+        <div>
 
-        <nav class="sidebar-nav">
-
-            <a href="dashboard.html">
-                📊 Dashboard
-            </a>
-
-            <a href="inventory.html">
-                📦 Inventory
-            </a>
-
-            <a href="borrowers.html">
-                👥 Borrowers
-            </a>
-
-            <a href="departments.html">
-                🏢 Departments
-            </a>
-
-            <a href="../qr/generate.html">
-                🔳 QR Codes
-            </a>
-
-            <a href="../qr/scan.html">
-                📷 QR Scanner
-            </a>
-
-            <a href="requests.html">
-                📥 Borrow Requests
-            </a>
-
-            <a href="transactions.html">
-                📋 Transactions
-            </a>
-
-            <a
-                href="../index.html"
-                onclick="logout()"
-            >
-                🚪 Logout
-            </a>
-
-        </nav>
-
-    </aside>
-
-
-    <!-- MAIN -->
-
-    <main class="main-content">
-
-
-        <div class="page-header">
-
-            <div>
-
-                <h1>
-                    Transactions
-                </h1>
-
-                <p>
-                    View borrowing and return transactions.
-                </p>
-
-            </div>
-
-        </div>
-
-
-        <div class="content-card">
-
-            <h2 style="margin-bottom:20px;">
-                Transaction History
+            <h2>
+                Inventory
             </h2>
 
+            <p>
+                Management System
+            </p>
 
-            <div class="table-container">
+        </div>
 
-                <table class="data-table">
-
-                    <thead>
-
-                        <tr>
-
-                            <th>
-                                Transaction ID
-                            </th>
-
-                            <th>
-                                Item
-                            </th>
-
-                            <th>
-                                Borrower
-                            </th>
-
-                            <th>
-                                Borrowed Date
-                            </th>
-
-                            <th>
-                                Return Date
-                            </th>
-
-                            <th>
-                                Status
-                            </th>
-
-                            <th>
-                                Action
-                            </th>
-
-                        </tr>
-
-                    </thead>
+    </div>
 
 
-                    <tbody id="transactionsTable">
+    <nav>
 
-                    </tbody>
+        <a href="dashboard.html">
+            📊 Dashboard
+        </a>
 
-                </table>
+        <a href="inventory.html">
+            📦 Inventory
+        </a>
 
+        <a href="borrowers.html">
+            👥 Borrowers
+        </a>
+
+        <a href="departments.html">
+            🏢 Departments
+        </a>
+
+        <a href="qr/scan.html">
+            📷 QR Scanner
+        </a>
+
+        <a href="requests.html">
+            📥 Borrow Requests
+        </a>
+
+        <a href="transactions.html">
+            📋 Transaction History
+        </a>
+
+        <a
+            href="index.html"
+            onclick="logout()"
+        >
+            🚪 Logout
+        </a>
+
+    </nav>
+
+</aside>
+
+
+<!-- MAIN CONTENT -->
+
+<main class="main-content">
+
+
+    <div class="page-header">
+
+        <div>
+
+            <h1>
+                Transaction History
+            </h1>
+
+            <p>
+                View all borrowing and returning transactions.
+            </p>
+
+        </div>
+
+    </div>
+
+
+    <!-- SUMMARY -->
+
+    <div class="summary">
+
+        <div class="summary-card">
+
+            <h3>
+                Total Transactions
+            </h3>
+
+            <div
+                class="summary-number"
+                id="totalTransactions"
+            >
+                0
             </div>
 
         </div>
 
 
-    </main>
+        <div class="summary-card">
+
+            <h3>
+                Currently Borrowed
+            </h3>
+
+            <div
+                class="summary-number"
+                id="activeTransactions"
+            >
+                0
+            </div>
+
+        </div>
+
+
+        <div class="summary-card">
+
+            <h3>
+                Returned
+            </h3>
+
+            <div
+                class="summary-number"
+                id="returnedTransactions"
+            >
+                0
+            </div>
+
+        </div>
+
+    </div>
+
+
+    <!-- TRANSACTION TABLE -->
+
+    <div class="content-card">
+
+        <div class="table-wrapper">
+
+            <table class="data-table">
+
+                <thead>
+
+                    <tr>
+
+                        <th>
+                            Transaction ID
+                        </th>
+
+                        <th>
+                            Borrower
+                        </th>
+
+                        <th>
+                            Item
+                        </th>
+
+                        <th>
+                            Quantity
+                        </th>
+
+                        <th>
+                            Borrowed Date
+                        </th>
+
+                        <th>
+                            Return Date
+                        </th>
+
+                        <th>
+                            Status
+                        </th>
+
+                    </tr>
+
+                </thead>
+
+
+                <tbody id="transactionTable">
+
+                </tbody>
+
+            </table>
+
+        </div>
+
+    </div>
+
+
+</main>
+```
 
 </div>
 
-
 <script>
 
-/* =====================================
-   ADMIN CHECK
-===================================== */
+/*
+|--------------------------------------------------------------------------
+| LOGIN CHECK
+|--------------------------------------------------------------------------
+*/
 
 const user =
     JSON.parse(
@@ -253,64 +343,63 @@ const user =
     );
 
 
-if (
-    !user ||
-    user.role !== "admin"
-) {
+if (!user) {
 
     window.location.href =
-        "../index.html";
+        "index.html";
 
 }
 
 
-/* =====================================
-   LOAD DATA
-===================================== */
+/*
+|--------------------------------------------------------------------------
+| TRANSACTION DATA
+|--------------------------------------------------------------------------
+*/
 
-let transactions =
-    JSON.parse(
-        localStorage.getItem(
-            "transactions"
-        )
-    ) || [];
+let transactions = [];
 
 
-let items =
-    JSON.parse(
-        localStorage.getItem(
-            "inventoryItems"
-        )
-    ) || [];
+/*
+|--------------------------------------------------------------------------
+| LOAD TRANSACTIONS
+|--------------------------------------------------------------------------
+*/
+
+function loadTransactions() {
+
+    transactions =
+        JSON.parse(
+            localStorage.getItem("transactions")
+        ) || [];
+
+}
 
 
-const table =
-    document.getElementById(
-        "transactionsTable"
-    );
-
-
-/* =====================================
-   CREATE TRANSACTIONS FROM APPROVED
-   REQUESTS
-===================================== */
+/*
+|--------------------------------------------------------------------------
+| SYNCHRONIZE APPROVED REQUESTS
+|--------------------------------------------------------------------------
+*/
 
 function synchronizeTransactions() {
 
     const requests =
         JSON.parse(
-            localStorage.getItem(
-                "borrowRequests"
-            )
+            localStorage.getItem("borrowRequests")
         ) || [];
 
 
     requests.forEach(
-        function(request) {
+        request => {
+
+            /*
+            Only approved requests
+            become transactions.
+            */
 
             if (
-                request.status !==
-                "Approved"
+                request.status !== "Approved"
             ) {
 
                 return;
@@ -318,20 +407,32 @@ function synchronizeTransactions() {
             }
 
 
-            const exists =
+            /*
+            Prevent duplicate transactions.
+            */
+
+            const alreadyExists =
                 transactions.some(
                     transaction =>
-                        transaction.requestId ===
-                        request.id
+                        String(
+                            transaction.requestId
+                        ) ===
+                        String(
+                            request.id
+                        )
                 );
 
 
-            if (exists) {
+            if (alreadyExists) {
 
                 return;
 
             }
 
+
+            /*
+            Create transaction.
+            */
 
             const transaction = {
 
@@ -347,19 +448,34 @@ function synchronizeTransactions() {
                     request.id,
 
                 itemId:
-                    request.itemId,
+                    request.itemId ||
+                    "",
 
                 itemName:
-                    request.itemName,
+                    request.itemName ||
+                    request.item ||
+                    "Unknown Item",
 
                 borrowerName:
-                    request.borrowerName,
+                    request.borrowerName ||
+                    request.borrower ||
+                    "Unknown Borrower",
 
                 username:
-                    request.username,
+                    request.username ||
+                    "",
+
+                department:
+                    request.department ||
+                    "N/A",
+
+                quantity:
+                    request.quantity ||
+                    1,
 
                 borrowedDate:
                     request.approvedDate ||
+                    request.date ||
                     new Date().toISOString(),
 
                 returnDate:
@@ -379,6 +495,10 @@ function synchronizeTransactions() {
     );
 
 
+    /*
+    Save updated transactions.
+    */
+
     localStorage.setItem(
         "transactions",
         JSON.stringify(
@@ -389,17 +509,158 @@ function synchronizeTransactions() {
 }
 
 
-/* =====================================
-   DISPLAY TRANSACTIONS
-===================================== */
+/*
+|--------------------------------------------------------------------------
+| CHECK OVERDUE TRANSACTIONS
+|--------------------------------------------------------------------------
+*/
+
+function updateOverdueStatus() {
+
+    let changed = false;
+
+
+    transactions.forEach(
+        transaction => {
+
+            if (
+                transaction.status !==
+                "Borrowed"
+            ) {
+
+                return;
+
+            }
+
+
+            /*
+            If a due date exists,
+            check whether it has passed.
+            */
+
+            if (
+                !transaction.dueDate
+            ) {
+
+                return;
+
+            }
+
+
+            const dueDate =
+                new Date(
+                    transaction.dueDate
+                );
+
+
+            if (
+                dueDate < new Date()
+            ) {
+
+                transaction.status =
+                    "Overdue";
+
+                changed = true;
+
+            }
+
+        }
+    );
+
+
+    if (changed) {
+
+        localStorage.setItem(
+            "transactions",
+            JSON.stringify(
+                transactions
+            )
+        );
+
+    }
+
+}
+
+
+/*
+|--------------------------------------------------------------------------
+| DISPLAY TRANSACTIONS
+|--------------------------------------------------------------------------
+*/
 
 function displayTransactions() {
+
+    const table =
+        document.getElementById(
+            "transactionTable"
+        );
+
 
     table.innerHTML = "";
 
 
+    /*
+    Sort newest first.
+    */
+
+    const sortedTransactions =
+        [...transactions].sort(
+            (a, b) => {
+
+                const dateA =
+                    new Date(
+                        a.borrowedDate || 0
+                    );
+
+                const dateB =
+                    new Date(
+                        b.borrowedDate || 0
+                    );
+
+                return dateB - dateA;
+
+            }
+        );
+
+
+    /*
+    Update summary.
+    */
+
+    document.getElementById(
+        "totalTransactions"
+    ).textContent =
+        transactions.length;
+
+
+    document.getElementById(
+        "activeTransactions"
+    ).textContent =
+        transactions.filter(
+            transaction =>
+                transaction.status ===
+                "Borrowed" ||
+                transaction.status ===
+                "Overdue"
+        ).length;
+
+
+    document.getElementById(
+        "returnedTransactions"
+    ).textContent =
+        transactions.filter(
+            transaction =>
+                transaction.status ===
+                "Returned"
+        ).length;
+
+
+    /*
+    No transactions.
+    */
+
     if (
-        transactions.length === 0
+        sortedTransactions.length === 0
     ) {
 
         table.innerHTML = `
@@ -410,9 +671,7 @@ function displayTransactions() {
                     colspan="7"
                     class="empty-message"
                 >
-
-                    No transactions yet.
-
+                    No transaction records found.
                 </td>
 
             </tr>
@@ -424,12 +683,21 @@ function displayTransactions() {
     }
 
 
-    transactions.forEach(
-        function(transaction, index) {
+    /*
+    Display records.
+    */
+
+    sortedTransactions.forEach(
+        transaction => {
+
+            const row =
+                document.createElement(
+                    "tr"
+                );
 
 
             let statusClass =
-                "status-borrowed";
+                "borrowed";
 
 
             if (
@@ -438,7 +706,7 @@ function displayTransactions() {
             ) {
 
                 statusClass =
-                    "status-returned";
+                    "returned";
 
             }
 
@@ -449,115 +717,74 @@ function displayTransactions() {
             ) {
 
                 statusClass =
-                    "status-overdue";
+                    "overdue";
 
             }
 
 
-            const borrowedDate =
-                transaction.borrowedDate
-                    ? new Date(
-                        transaction.borrowedDate
-                    ).toLocaleString()
-                    : "-";
+            row.innerHTML = `
 
+                <td>
+                    ${transaction.id || "N/A"}
+                </td>
 
-            const returnDate =
-                transaction.returnDate
-                    ? new Date(
+                <td>
+                    ${
+                        transaction.borrowerName ||
+                        transaction.borrower ||
+                        "Unknown"
+                    }
+                </td>
+
+                <td>
+                    ${
+                        transaction.itemName ||
+                        transaction.item ||
+                        "Unknown"
+                    }
+                </td>
+
+                <td>
+                    ${transaction.quantity || 1}
+                </td>
+
+                <td>
+                    ${
+                        formatDate(
+                            transaction.borrowedDate
+                        )
+                    }
+                </td>
+
+                <td>
+                    ${
                         transaction.returnDate
-                    ).toLocaleString()
-                    : "-";
+                            ? formatDate(
+                                transaction.returnDate
+                            )
+                            : "—"
+                    }
+                </td>
 
+                <td>
 
-            let action = "";
-
-
-            if (
-                transaction.status ===
-                "Borrowed"
-            ) {
-
-                action = `
-
-                    <button
-                        class="btn btn-return"
-                        onclick="returnItem(${index})"
+                    <span
+                        class="status ${statusClass}"
                     >
-                        Return Item
-                    </button>
+                        ${
+                            transaction.status ||
+                            "Borrowed"
+                        }
+                    </span>
 
-                `;
-
-            }
-
-            else {
-
-                action =
-                    "<span>Completed</span>";
-
-            }
-
-
-            table.innerHTML += `
-
-                <tr>
-
-                    <td>
-                        ${transaction.id}
-                    </td>
-
-                    <td>
-
-                        <strong>
-                            ${transaction.itemName}
-                        </strong>
-
-                        <br>
-
-                        <small>
-                            ${transaction.itemId}
-                        </small>
-
-                    </td>
-
-                    <td>
-
-                        ${transaction.borrowerName}
-
-                        <br>
-
-                        <small>
-                            ${transaction.username}
-                        </small>
-
-                    </td>
-
-                    <td>
-                        ${borrowedDate}
-                    </td>
-
-                    <td>
-                        ${returnDate}
-                    </td>
-
-                    <td>
-
-                        <span
-                            class="status ${statusClass}"
-                        >
-                            ${transaction.status}
-                        </span>
-
-                    </td>
-
-                    <td>
-                        ${action}
-                    </td>
-
-                </tr>
+                </td>
 
             `;
+
+
+            table.appendChild(
+                row
+            );
 
         }
     );
@@ -565,105 +792,107 @@ function displayTransactions() {
 }
 
 
-/* =====================================
-   RETURN ITEM
-===================================== */
+/*
+|--------------------------------------------------------------------------
+| FORMAT DATE
+|--------------------------------------------------------------------------
+*/
 
-function returnItem(index) {
+function formatDate(dateValue) {
 
-    const transaction =
-        transactions[index];
+    if (!dateValue) {
 
-
-    if (!transaction) {
-
-        return;
+        return "N/A";
 
     }
+
+
+    const date =
+        new Date(dateValue);
 
 
     if (
-        !confirm(
-            "Confirm that this item has been returned?"
+        isNaN(
+            date.getTime()
         )
     ) {
 
-        return;
+        return dateValue;
 
     }
 
 
-    /* -------------------------------
-       UPDATE TRANSACTION
-    ------------------------------- */
-
-    transaction.status =
-        "Returned";
-
-
-    transaction.returnDate =
-        new Date().toISOString();
-
-
-    transaction.returnedBy =
-        user.username;
-
-
-    /* -------------------------------
-       UPDATE INVENTORY
-    ------------------------------- */
-
-    const itemIndex =
-        items.findIndex(
-            item =>
-                item.id ===
-                transaction.itemId
-        );
-
-
-    if (
-        itemIndex !== -1
-    ) {
-
-        items[itemIndex].status =
-            "Available";
-
-    }
-
-
-    /* -------------------------------
-       SAVE DATA
-    ------------------------------- */
-
-    localStorage.setItem(
-        "transactions",
-        JSON.stringify(
-            transactions
-        )
-    );
-
-
-    localStorage.setItem(
-        "inventoryItems",
-        JSON.stringify(
-            items
-        )
-    );
-
-
-    displayTransactions();
-
-
-    alert(
-        "Item successfully returned."
+    return date.toLocaleDateString(
+        undefined,
+        {
+            year: "numeric",
+            month: "short",
+            day: "numeric"
+        }
     );
 
 }
 
 
-/* =====================================
-   LOGOUT
-===================================== */
+/*
+|--------------------------------------------------------------------------
+| REFRESH EVERYTHING
+|--------------------------------------------------------------------------
+*/
+
+function refreshTransactions() {
+
+    /*
+    First get the newest localStorage data.
+    */
+
+    loadTransactions();
+
+
+    /*
+    Check approved requests.
+    */
+
+    synchronizeTransactions();
+
+
+    /*
+    Reload because synchronization
+    may have added a transaction.
+    */
+
+    loadTransactions();
+
+
+    /*
+    Check overdue status.
+    */
+
+    updateOverdueStatus();
+
+
+    /*
+    Reload one more time so the table
+    always uses the newest data.
+    */
+
+    loadTransactions();
+
+
+    /*
+    Display.
+    */
+
+    displayTransactions();
+
+}
+
+
+/*
+|--------------------------------------------------------------------------
+| LOGOUT
+|--------------------------------------------------------------------------
+*/
 
 function logout() {
 
@@ -674,16 +903,56 @@ function logout() {
 }
 
 
-/* =====================================
-   START
-===================================== */
+/*
+|--------------------------------------------------------------------------
+| INITIAL LOAD
+|--------------------------------------------------------------------------
+*/
 
-synchronizeTransactions();
+refreshTransactions();
 
-displayTransactions();
+
+/*
+|--------------------------------------------------------------------------
+| UPDATE WHEN TAB BECOMES ACTIVE
+|--------------------------------------------------------------------------
+*/
+
+window.addEventListener(
+    "focus",
+    function() {
+
+        refreshTransactions();
+
+    }
+);
+
+
+/*
+|--------------------------------------------------------------------------
+| UPDATE WHEN LOCAL STORAGE CHANGES
+|--------------------------------------------------------------------------
+*/
+
+window.addEventListener(
+    "storage",
+    function(event) {
+
+        if (
+            event.key ===
+            "transactions" ||
+            event.key ===
+            "borrowRequests"
+        ) {
+
+            refreshTransactions();
+
+        }
+
+    }
+);
 
 </script>
-
 
 </body>
 
