@@ -1,19 +1,12 @@
 <!DOCTYPE html>
 <html lang="en">
-
 <head>
-
     <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-    <meta
-        name="viewport"
-        content="width=device-width, initial-scale=1.0"
-    >
-
-    <title>Admin Dashboard</title>
+    <title>Admin Dashboard - Inventory System</title>
 
     <style>
-
         * {
             box-sizing: border-box;
             margin: 0;
@@ -22,7 +15,7 @@
 
         body {
             font-family: Arial, sans-serif;
-            background: #f1f5f2;
+            background: #f3f6f4;
             color: #26332b;
         }
 
@@ -31,9 +24,11 @@
             min-height: 100vh;
         }
 
+        /* SIDEBAR */
+
         .sidebar {
-            width: 240px;
-            background: #163b29;
+            width: 250px;
+            background: #17452c;
             color: white;
             padding: 25px 15px;
         }
@@ -44,7 +39,7 @@
         }
 
         .brand-icon {
-            font-size: 35px;
+            font-size: 40px;
         }
 
         .brand h2 {
@@ -53,48 +48,55 @@
 
         .brand p {
             font-size: 12px;
-            opacity: .7;
+            opacity: 0.75;
+            margin-top: 4px;
         }
 
         .nav a {
             display: block;
             color: white;
             text-decoration: none;
-            padding: 13px;
-            border-radius: 8px;
+            padding: 13px 15px;
             margin-bottom: 5px;
+            border-radius: 8px;
         }
 
-        .nav a:hover {
-            background: #24563b;
+        .nav a:hover,
+        .nav a.active {
+            background: #28613e;
         }
 
         .logout {
-            margin-top: 25px !important;
+            margin-top: 25px;
             background: #8b2635;
         }
+
+        /* MAIN */
 
         .main {
             flex: 1;
             padding: 30px;
         }
 
-        .header {
+        .page-header {
             margin-bottom: 25px;
         }
 
-        .header h1 {
-            margin-bottom: 5px;
+        .page-header h1 {
+            font-size: 28px;
+            margin-bottom: 7px;
         }
 
-        .header p {
-            color: #6d786f;
+        .page-header p {
+            color: #6b756e;
         }
+
+        /* CARDS */
 
         .cards {
             display: grid;
             grid-template-columns:
-                repeat(auto-fit, minmax(190px, 1fr));
+                repeat(auto-fit, minmax(200px, 1fr));
 
             gap: 18px;
             margin-bottom: 25px;
@@ -104,38 +106,60 @@
             background: white;
             padding: 22px;
             border-radius: 12px;
-            box-shadow: 0 5px 18px rgba(0,0,0,.05);
+            box-shadow: 0 4px 15px rgba(0,0,0,0.05);
         }
 
-        .card h3 {
+        .card-title {
+            color: #68736c;
             font-size: 14px;
-            color: #68746c;
+            margin-bottom: 10px;
         }
 
         .number {
             font-size: 32px;
             font-weight: bold;
-            margin-top: 10px;
             color: #198754;
         }
 
+        /* TABLE */
+
         .panel {
             background: white;
-            padding: 25px;
             border-radius: 12px;
+            padding: 25px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.05);
         }
 
         .panel h2 {
-            margin-bottom: 15px;
+            margin-bottom: 20px;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        th,
+        td {
+            padding: 13px;
+            text-align: left;
+            border-bottom: 1px solid #e5e9e6;
+        }
+
+        th {
+            font-size: 13px;
+            color: #66716a;
         }
 
         .empty {
+            text-align: center;
+            padding: 25px;
             color: #777;
-            padding: 20px 0;
         }
 
+        /* MOBILE */
 
-        @media(max-width:700px) {
+        @media (max-width: 700px) {
 
             .layout {
                 display: block;
@@ -152,25 +176,26 @@
             }
 
             .logout {
-                margin-top: 5px !important;
+                margin-top: 5px;
             }
 
             .main {
                 padding: 20px;
             }
 
+            table {
+                font-size: 13px;
+            }
+
         }
-
     </style>
-
 </head>
-
 
 <body>
 
-
 <div class="layout">
 
+    <!-- SIDEBAR -->
 
     <aside class="sidebar">
 
@@ -182,14 +207,17 @@
 
             <h2>Inventory</h2>
 
-            <p>Admin Panel</p>
+            <p>Administrator</p>
 
         </div>
 
 
         <nav class="nav">
 
-            <a href="dashboard.html">
+            <a
+                href="dashboard.html"
+                class="active"
+            >
                 📊 Dashboard
             </a>
 
@@ -201,16 +229,16 @@
                 👥 Borrowers
             </a>
 
-            <a href="requests.html">
-                📋 Borrow Requests
+            <a href="departments.html">
+                🏢 Departments
             </a>
 
             <a href="transactions.html">
                 🔄 Transactions
             </a>
 
-            <a href="qr.html">
-                🔳 QR Codes
+            <a href="../qr/">
+                📷 QR Scanner
             </a>
 
             <a
@@ -226,9 +254,11 @@
     </aside>
 
 
+    <!-- MAIN CONTENT -->
+
     <main class="main">
 
-        <div class="header">
+        <div class="page-header">
 
             <h1>
                 Admin Dashboard
@@ -241,14 +271,15 @@
         </div>
 
 
-        <div class="cards">
+        <!-- DASHBOARD CARDS -->
 
+        <div class="cards">
 
             <div class="card">
 
-                <h3>
+                <div class="card-title">
                     Total Items
-                </h3>
+                </div>
 
                 <div
                     class="number"
@@ -262,9 +293,9 @@
 
             <div class="card">
 
-                <h3>
-                    Available
-                </h3>
+                <div class="card-title">
+                    Available Items
+                </div>
 
                 <div
                     class="number"
@@ -278,9 +309,9 @@
 
             <div class="card">
 
-                <h3>
-                    Borrowed
-                </h3>
+                <div class="card-title">
+                    Borrowed Items
+                </div>
 
                 <div
                     class="number"
@@ -294,9 +325,9 @@
 
             <div class="card">
 
-                <h3>
+                <div class="card-title">
                     Pending Requests
-                </h3>
+                </div>
 
                 <div
                     class="number"
@@ -307,9 +338,10 @@
 
             </div>
 
-
         </div>
 
+
+        <!-- RECENT TRANSACTIONS -->
 
         <div class="panel">
 
@@ -317,12 +349,50 @@
                 Recent Transactions
             </h2>
 
-            <div class="empty">
-                No transactions yet.
-            </div>
+            <table>
+
+                <thead>
+
+                    <tr>
+
+                        <th>
+                            Date
+                        </th>
+
+                        <th>
+                            Item
+                        </th>
+
+                        <th>
+                            Borrower
+                        </th>
+
+                        <th>
+                            Action
+                        </th>
+
+                    </tr>
+
+                </thead>
+
+                <tbody id="transactionTable">
+
+                    <tr>
+
+                        <td
+                            colspan="4"
+                            class="empty"
+                        >
+                            No transactions yet.
+                        </td>
+
+                    </tr>
+
+                </tbody>
+
+            </table>
 
         </div>
-
 
     </main>
 
@@ -330,6 +400,27 @@
 
 
 <script>
+
+/* CHECK LOGIN */
+
+const user =
+    JSON.parse(
+        localStorage.getItem("inventoryUser")
+    );
+
+
+if (
+    !user ||
+    user.role !== "admin"
+) {
+
+    window.location.href =
+        "../index.html";
+
+}
+
+
+/* LOGOUT */
 
 function logout() {
 
@@ -340,22 +431,64 @@ function logout() {
 }
 
 
-const user =
+/* LOAD INVENTORY */
+
+const items =
     JSON.parse(
-        localStorage.getItem("inventoryUser")
-    );
+        localStorage.getItem("inventoryItems")
+    ) || [];
 
 
-if (!user || user.role !== "admin") {
+const total =
+    items.length;
 
-    window.location.href =
-        "../index.html";
 
-}
+const available =
+    items.filter(
+        item => item.status === "Available"
+    ).length;
+
+
+const borrowed =
+    items.filter(
+        item => item.status === "Borrowed"
+    ).length;
+
+
+document.getElementById(
+    "totalItems"
+).textContent = total;
+
+
+document.getElementById(
+    "availableItems"
+).textContent = available;
+
+
+document.getElementById(
+    "borrowedItems"
+).textContent = borrowed;
+
+
+/* LOAD REQUESTS */
+
+const requests =
+    JSON.parse(
+        localStorage.getItem("borrowRequests")
+    ) || [];
+
+
+const pending =
+    requests.filter(
+        request => request.status === "Pending"
+    ).length;
+
+
+document.getElementById(
+    "pendingRequests"
+).textContent = pending;
 
 </script>
 
-
 </body>
-
 </html>
