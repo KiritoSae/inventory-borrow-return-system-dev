@@ -1,0 +1,610 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+
+    <meta charset="UTF-8">
+
+    <meta
+        name="viewport"
+        content="width=device-width, initial-scale=1.0"
+    >
+
+    <title>Transaction History - Inventory System</title>
+
+    <link
+        rel="stylesheet"
+        href="../assets/css/style.css"
+    >
+
+    <style>
+
+        .content-card {
+            background: white;
+            border: 1px solid #e4ebe6;
+            border-radius: 14px;
+            padding: 25px;
+        }
+
+        .status {
+            display: inline-block;
+            padding: 5px 10px;
+            border-radius: 20px;
+            font-size: 12px;
+            font-weight: 600;
+        }
+
+        .status-borrowed {
+            background: #fff3cd;
+            color: #856404;
+        }
+
+        .status-returned {
+            background: #d1e7dd;
+            color: #0f5132;
+        }
+
+        .status-overdue {
+            background: #f8d7da;
+            color: #842029;
+        }
+
+        .empty-message {
+            text-align: center;
+            padding: 35px;
+            color: #718078;
+        }
+
+        .history-summary {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 18px;
+            margin-bottom: 25px;
+        }
+
+        .summary-card {
+            background: white;
+            border: 1px solid #e4ebe6;
+            border-radius: 14px;
+            padding: 20px;
+        }
+
+        .summary-card h3 {
+            font-size: 13px;
+            color: #748078;
+            margin-bottom: 8px;
+        }
+
+        .summary-card .number {
+            font-size: 26px;
+            font-weight: bold;
+            color: #173c29;
+        }
+
+        @media (max-width: 700px) {
+
+            .history-summary {
+                grid-template-columns: 1fr;
+            }
+
+        }
+
+    </style>
+
+</head>
+
+
+<body>
+
+
+<div class="app-layout">
+
+
+    <!-- SIDEBAR -->
+
+    <aside class="sidebar">
+
+        <div class="sidebar-logo">
+
+            <div class="logo-icon">
+                📦
+            </div>
+
+            <div>
+
+                <h2>
+                    Inventory
+                </h2>
+
+                <p>
+                    Management System
+                </p>
+
+            </div>
+
+        </div>
+
+
+        <nav class="sidebar-nav">
+
+            <a
+                href="dashboard.html"
+                class="nav-link"
+            >
+
+                <span class="nav-icon">
+                    📊
+                </span>
+
+                <span>
+                    Dashboard
+                </span>
+
+            </a>
+
+
+            <a
+                href="../qr/scan.html"
+                class="nav-link"
+            >
+
+                <span class="nav-icon">
+                    📷
+                </span>
+
+                <span>
+                    Scan QR Code
+                </span>
+
+            </a>
+
+
+            <a
+                href="borrow.html"
+                class="nav-link"
+            >
+
+                <span class="nav-icon">
+                    📦
+                </span>
+
+                <span>
+                    My Borrowed Items
+                </span>
+
+            </a>
+
+
+            <a
+                href="history.html"
+                class="nav-link"
+            >
+
+                <span class="nav-icon">
+                    📋
+                </span>
+
+                <span>
+                    Transaction History
+                </span>
+
+            </a>
+
+
+            <a
+                href="../index.html"
+                class="nav-link logout-link"
+                onclick="logout()"
+            >
+
+                <span class="nav-icon">
+                    🚪
+                </span>
+
+                <span>
+                    Logout
+                </span>
+
+            </a>
+
+        </nav>
+
+    </aside>
+
+
+    <!-- MAIN -->
+
+    <main class="main-content">
+
+
+        <div class="page-header">
+
+            <div>
+
+                <h1>
+                    Transaction History
+                </h1>
+
+                <p>
+                    View your complete borrowing history.
+                </p>
+
+            </div>
+
+        </div>
+
+
+        <!-- SUMMARY -->
+
+        <div class="history-summary">
+
+
+            <div class="summary-card">
+
+                <h3>
+                    Total Transactions
+                </h3>
+
+                <div
+                    class="number"
+                    id="totalCount"
+                >
+                    0
+                </div>
+
+            </div>
+
+
+            <div class="summary-card">
+
+                <h3>
+                    Currently Borrowed
+                </h3>
+
+                <div
+                    class="number"
+                    id="borrowedCount"
+                >
+                    0
+                </div>
+
+            </div>
+
+
+            <div class="summary-card">
+
+                <h3>
+                    Returned
+                </h3>
+
+                <div
+                    class="number"
+                    id="returnedCount"
+                >
+                    0
+                </div>
+
+            </div>
+
+
+        </div>
+
+
+        <!-- HISTORY TABLE -->
+
+        <div class="content-card">
+
+
+            <div class="table-container">
+
+                <table class="data-table">
+
+                    <thead>
+
+                        <tr>
+
+                            <th>
+                                Transaction ID
+                            </th>
+
+                            <th>
+                                Item
+                            </th>
+
+                            <th>
+                                Borrowed Date
+                            </th>
+
+                            <th>
+                                Return Date
+                            </th>
+
+                            <th>
+                                Status
+                            </th>
+
+                        </tr>
+
+                    </thead>
+
+
+                    <tbody id="historyTable">
+
+                    </tbody>
+
+                </table>
+
+            </div>
+
+
+        </div>
+
+
+    </main>
+
+</div>
+
+
+<script>
+
+/* =====================================
+   LOGIN CHECK
+===================================== */
+
+const user =
+    JSON.parse(
+        localStorage.getItem(
+            "inventoryUser"
+        )
+    );
+
+
+if (!user) {
+
+    window.location.href =
+        "../index.html";
+
+}
+
+
+/* =====================================
+   LOAD TRANSACTIONS
+===================================== */
+
+const allTransactions =
+    JSON.parse(
+        localStorage.getItem(
+            "transactions"
+        )
+    ) || [];
+
+
+/* =====================================
+   ONLY THIS USER'S TRANSACTIONS
+===================================== */
+
+const transactions =
+    allTransactions.filter(
+        function(transaction) {
+
+            return (
+                transaction.username ===
+                user.username
+            );
+
+        }
+    );
+
+
+/* =====================================
+   COUNTS
+===================================== */
+
+const borrowed =
+    transactions.filter(
+        function(transaction) {
+
+            return (
+                transaction.status ===
+                "Borrowed"
+            );
+
+        }
+    );
+
+
+const returned =
+    transactions.filter(
+        function(transaction) {
+
+            return (
+                transaction.status ===
+                "Returned"
+            );
+
+        }
+    );
+
+
+document.getElementById(
+    "totalCount"
+).textContent =
+    transactions.length;
+
+
+document.getElementById(
+    "borrowedCount"
+).textContent =
+    borrowed.length;
+
+
+document.getElementById(
+    "returnedCount"
+).textContent =
+    returned.length;
+
+
+/* =====================================
+   DISPLAY HISTORY
+===================================== */
+
+const table =
+    document.getElementById(
+        "historyTable"
+    );
+
+
+if (transactions.length === 0) {
+
+    table.innerHTML = `
+
+        <tr>
+
+            <td
+                colspan="5"
+                class="empty-message"
+            >
+
+                You don't have any transaction
+                history yet.
+
+            </td>
+
+        </tr>
+
+    `;
+
+}
+
+
+else {
+
+    transactions
+        .slice()
+        .reverse()
+        .forEach(
+            function(transaction) {
+
+
+                let statusClass =
+                    "status-borrowed";
+
+
+                if (
+                    transaction.status ===
+                    "Returned"
+                ) {
+
+                    statusClass =
+                        "status-returned";
+
+                }
+
+
+                if (
+                    transaction.status ===
+                    "Overdue"
+                ) {
+
+                    statusClass =
+                        "status-overdue";
+
+                }
+
+
+                const borrowedDate =
+                    transaction.borrowedDate
+                        ? new Date(
+                            transaction.borrowedDate
+                        ).toLocaleString()
+                        : "-";
+
+
+                const returnDate =
+                    transaction.returnDate
+                        ? new Date(
+                            transaction.returnDate
+                        ).toLocaleString()
+                        : "-";
+
+
+                table.innerHTML += `
+
+                    <tr>
+
+                        <td>
+
+                            ${transaction.id}
+
+                        </td>
+
+
+                        <td>
+
+                            <strong>
+                                ${transaction.itemName}
+                            </strong>
+
+                            <br>
+
+                            <small>
+                                ${transaction.itemId}
+                            </small>
+
+                        </td>
+
+
+                        <td>
+
+                            ${borrowedDate}
+
+                        </td>
+
+
+                        <td>
+
+                            ${returnDate}
+
+                        </td>
+
+
+                        <td>
+
+                            <span
+                                class="status ${statusClass}"
+                            >
+
+                                ${transaction.status}
+
+                            </span>
+
+                        </td>
+
+                    </tr>
+
+                `;
+
+            }
+        );
+
+}
+
+
+/* =====================================
+   LOGOUT
+===================================== */
+
+function logout() {
+
+    localStorage.removeItem(
+        "inventoryUser"
+    );
+
+}
+
+</script>
+
+
+</body>
+
+</html>
