@@ -1,0 +1,361 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+
+    <meta charset="UTF-8">
+
+    <meta
+        name="viewport"
+        content="width=device-width, initial-scale=1.0"
+    >
+
+    <title>Admin Dashboard</title>
+
+    <style>
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            font-family: Arial, sans-serif;
+            background: #f1f5f2;
+            color: #26332b;
+        }
+
+        .layout {
+            display: flex;
+            min-height: 100vh;
+        }
+
+        .sidebar {
+            width: 240px;
+            background: #163b29;
+            color: white;
+            padding: 25px 15px;
+        }
+
+        .brand {
+            text-align: center;
+            margin-bottom: 30px;
+        }
+
+        .brand-icon {
+            font-size: 35px;
+        }
+
+        .brand h2 {
+            margin-top: 8px;
+        }
+
+        .brand p {
+            font-size: 12px;
+            opacity: .7;
+        }
+
+        .nav a {
+            display: block;
+            color: white;
+            text-decoration: none;
+            padding: 13px;
+            border-radius: 8px;
+            margin-bottom: 5px;
+        }
+
+        .nav a:hover {
+            background: #24563b;
+        }
+
+        .logout {
+            margin-top: 25px !important;
+            background: #8b2635;
+        }
+
+        .main {
+            flex: 1;
+            padding: 30px;
+        }
+
+        .header {
+            margin-bottom: 25px;
+        }
+
+        .header h1 {
+            margin-bottom: 5px;
+        }
+
+        .header p {
+            color: #6d786f;
+        }
+
+        .cards {
+            display: grid;
+            grid-template-columns:
+                repeat(auto-fit, minmax(190px, 1fr));
+
+            gap: 18px;
+            margin-bottom: 25px;
+        }
+
+        .card {
+            background: white;
+            padding: 22px;
+            border-radius: 12px;
+            box-shadow: 0 5px 18px rgba(0,0,0,.05);
+        }
+
+        .card h3 {
+            font-size: 14px;
+            color: #68746c;
+        }
+
+        .number {
+            font-size: 32px;
+            font-weight: bold;
+            margin-top: 10px;
+            color: #198754;
+        }
+
+        .panel {
+            background: white;
+            padding: 25px;
+            border-radius: 12px;
+        }
+
+        .panel h2 {
+            margin-bottom: 15px;
+        }
+
+        .empty {
+            color: #777;
+            padding: 20px 0;
+        }
+
+
+        @media(max-width:700px) {
+
+            .layout {
+                display: block;
+            }
+
+            .sidebar {
+                width: 100%;
+            }
+
+            .nav {
+                display: grid;
+                grid-template-columns: 1fr 1fr;
+                gap: 5px;
+            }
+
+            .logout {
+                margin-top: 5px !important;
+            }
+
+            .main {
+                padding: 20px;
+            }
+
+        }
+
+    </style>
+
+</head>
+
+
+<body>
+
+
+<div class="layout">
+
+
+    <aside class="sidebar">
+
+        <div class="brand">
+
+            <div class="brand-icon">
+                📦
+            </div>
+
+            <h2>Inventory</h2>
+
+            <p>Admin Panel</p>
+
+        </div>
+
+
+        <nav class="nav">
+
+            <a href="dashboard.html">
+                📊 Dashboard
+            </a>
+
+            <a href="inventory.html">
+                📦 Inventory
+            </a>
+
+            <a href="borrowers.html">
+                👥 Borrowers
+            </a>
+
+            <a href="requests.html">
+                📋 Borrow Requests
+            </a>
+
+            <a href="transactions.html">
+                🔄 Transactions
+            </a>
+
+            <a href="qr.html">
+                🔳 QR Codes
+            </a>
+
+            <a
+                href="../index.html"
+                class="logout"
+                onclick="logout()"
+            >
+                🚪 Logout
+            </a>
+
+        </nav>
+
+    </aside>
+
+
+    <main class="main">
+
+        <div class="header">
+
+            <h1>
+                Admin Dashboard
+            </h1>
+
+            <p>
+                Welcome back, Administrator.
+            </p>
+
+        </div>
+
+
+        <div class="cards">
+
+
+            <div class="card">
+
+                <h3>
+                    Total Items
+                </h3>
+
+                <div
+                    class="number"
+                    id="totalItems"
+                >
+                    0
+                </div>
+
+            </div>
+
+
+            <div class="card">
+
+                <h3>
+                    Available
+                </h3>
+
+                <div
+                    class="number"
+                    id="availableItems"
+                >
+                    0
+                </div>
+
+            </div>
+
+
+            <div class="card">
+
+                <h3>
+                    Borrowed
+                </h3>
+
+                <div
+                    class="number"
+                    id="borrowedItems"
+                >
+                    0
+                </div>
+
+            </div>
+
+
+            <div class="card">
+
+                <h3>
+                    Pending Requests
+                </h3>
+
+                <div
+                    class="number"
+                    id="pendingRequests"
+                >
+                    0
+                </div>
+
+            </div>
+
+
+        </div>
+
+
+        <div class="panel">
+
+            <h2>
+                Recent Transactions
+            </h2>
+
+            <div class="empty">
+                No transactions yet.
+            </div>
+
+        </div>
+
+
+    </main>
+
+</div>
+
+
+<script>
+
+function logout() {
+
+    localStorage.removeItem(
+        "inventoryUser"
+    );
+
+}
+
+
+const user =
+    JSON.parse(
+        localStorage.getItem("inventoryUser")
+    );
+
+
+if (!user || user.role !== "admin") {
+
+    window.location.href =
+        "../index.html";
+
+}
+
+</script>
+
+
+</body>
+
+</html>
