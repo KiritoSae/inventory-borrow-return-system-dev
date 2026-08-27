@@ -1,0 +1,748 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+
+    <meta charset="UTF-8">
+
+    <meta
+        name="viewport"
+        content="width=device-width, initial-scale=1.0"
+    >
+
+    <title>QR Scanner - Inventory System</title>
+
+    <link
+        rel="stylesheet"
+        href="../assets/css/style.css"
+    >
+
+    <script src="https://unpkg.com/html5-qrcode"></script>
+
+    <style>
+
+        .scanner-card {
+            background: white;
+            border: 1px solid #e4ebe6;
+            border-radius: 14px;
+            padding: 25px;
+            max-width: 700px;
+        }
+
+        #reader {
+            width: 100%;
+            max-width: 500px;
+            margin: 20px auto;
+        }
+
+        .scan-instruction {
+            color: #718078;
+            margin-top: 8px;
+            font-size: 14px;
+        }
+
+        .item-result {
+            display: none;
+            margin-top: 25px;
+            padding: 22px;
+            border-radius: 12px;
+            background: #f7faf8;
+            border: 1px solid #dce7df;
+        }
+
+        .item-result h2 {
+            color: #173c29;
+            margin-bottom: 15px;
+        }
+
+        .item-detail {
+            display: flex;
+            justify-content: space-between;
+            padding: 10px 0;
+            border-bottom: 1px solid #e5ebe7;
+        }
+
+        .item-detail:last-child {
+            border-bottom: none;
+        }
+
+        .item-detail strong {
+            color: #536158;
+        }
+
+        .status {
+            display: inline-block;
+            padding: 5px 10px;
+            border-radius: 20px;
+            font-size: 12px;
+            font-weight: 600;
+        }
+
+        .status-available {
+            background: #d1e7dd;
+            color: #0f5132;
+        }
+
+        .status-borrowed {
+            background: #fff3cd;
+            color: #856404;
+        }
+
+        .status-maintenance {
+            background: #e2e3e5;
+            color: #41464b;
+        }
+
+        .message {
+            display: none;
+            padding: 14px;
+            margin-top: 20px;
+            border-radius: 8px;
+        }
+
+        .error-message {
+            background: #f8d7da;
+            color: #842029;
+        }
+
+        .borrow-button {
+            width: 100%;
+            margin-top: 20px;
+            padding: 13px;
+            border: none;
+            border-radius: 9px;
+            background: #198754;
+            color: white;
+            font-size: 15px;
+            font-weight: 600;
+            cursor: pointer;
+        }
+
+        .borrow-button:hover {
+            background: #146c43;
+        }
+
+        .borrow-button:disabled {
+            background: #8aa99a;
+            cursor: not-allowed;
+        }
+
+        @media (max-width: 650px) {
+
+            .scanner-card {
+                padding: 18px;
+            }
+
+            .item-detail {
+                display: block;
+            }
+
+            .item-detail strong {
+                display: block;
+                margin-bottom: 4px;
+            }
+
+        }
+
+    </style>
+
+</head>
+
+
+<body>
+
+
+<div class="app-layout">
+
+
+    <!-- SIDEBAR -->
+
+    <aside class="sidebar">
+
+        <div class="sidebar-logo">
+
+            <div class="logo-icon">
+                📦
+            </div>
+
+            <div>
+
+                <h2>
+                    Inventory
+                </h2>
+
+                <p>
+                    Management System
+                </p>
+
+            </div>
+
+        </div>
+
+
+        <nav>
+
+            <a href="../admin/dashboard.html">
+                📊 Dashboard
+            </a>
+
+            <a href="../admin/inventory.html">
+                📦 Inventory
+            </a>
+
+            <a href="../admin/borrowers.html">
+                👥 Borrowers
+            </a>
+
+            <a href="../admin/departments.html">
+                🏢 Departments
+            </a>
+
+            <a href="generate.html">
+                🔳 QR Codes
+            </a>
+
+            <a href="../admin/transactions.html">
+                📋 Transactions
+            </a>
+
+            <a href="scan.html">
+                📷 QR Scanner
+            </a>
+
+            <a
+                href="../index.html"
+                onclick="logout()"
+            >
+                🚪 Logout
+            </a>
+
+        </nav>
+
+    </aside>
+
+
+    <!-- MAIN -->
+
+    <main class="main-content">
+
+
+        <div class="page-header">
+
+            <div>
+
+                <h1>
+                    QR Scanner
+                </h1>
+
+                <p>
+                    Scan an inventory QR code using your camera.
+                </p>
+
+            </div>
+
+        </div>
+
+
+        <div class="scanner-card">
+
+            <h2>
+                Scan Inventory QR Code
+            </h2>
+
+            <p class="scan-instruction">
+                Allow camera access and point your camera
+                at the QR code attached to an item.
+            </p>
+
+
+            <!-- CAMERA -->
+
+            <div id="reader"></div>
+
+
+            <!-- ERROR -->
+
+            <div
+                id="errorMessage"
+                class="message error-message"
+            >
+            </div>
+
+
+            <!-- ITEM RESULT -->
+
+            <div
+                id="itemResult"
+                class="item-result"
+            >
+
+                <h2>
+                    Item Information
+                </h2>
+
+
+                <div class="item-detail">
+
+                    <strong>
+                        Item ID
+                    </strong>
+
+                    <span id="resultId">
+                    </span>
+
+                </div>
+
+
+                <div class="item-detail">
+
+                    <strong>
+                        Item Name
+                    </strong>
+
+                    <span id="resultName">
+                    </span>
+
+                </div>
+
+
+                <div class="item-detail">
+
+                    <strong>
+                        Category
+                    </strong>
+
+                    <span id="resultCategory">
+                    </span>
+
+                </div>
+
+
+                <div class="item-detail">
+
+                    <strong>
+                        Quantity
+                    </strong>
+
+                    <span id="resultQuantity">
+                    </span>
+
+                </div>
+
+
+                <div class="item-detail">
+
+                    <strong>
+                        Location
+                    </strong>
+
+                    <span id="resultLocation">
+                    </span>
+
+                </div>
+
+
+                <div class="item-detail">
+
+                    <strong>
+                        Status
+                    </strong>
+
+                    <span id="resultStatus">
+                    </span>
+
+                </div>
+
+
+                <button
+                    id="borrowButton"
+                    class="borrow-button"
+                    onclick="requestBorrow()"
+                >
+                    Request to Borrow
+                </button>
+
+            </div>
+
+        </div>
+
+
+    </main>
+
+</div>
+
+
+<script>
+
+/* =====================================
+   LOGIN CHECK
+===================================== */
+
+const user =
+    JSON.parse(
+        localStorage.getItem("inventoryUser")
+    );
+
+
+if (!user) {
+
+    window.location.href =
+        "../index.html";
+
+}
+
+
+/* =====================================
+   INVENTORY
+===================================== */
+
+const items =
+    JSON.parse(
+        localStorage.getItem("inventoryItems")
+    ) || [];
+
+
+let scannedItem = null;
+
+
+/* =====================================
+   QR SCAN SUCCESS
+===================================== */
+
+function onScanSuccess(decodedText) {
+
+    console.log(
+        "QR Code:",
+        decodedText
+    );
+
+
+    /*
+       QR contains the Item ID.
+       Example:
+
+       ITEM-0001
+    */
+
+    const item =
+        items.find(
+            item =>
+                item.id === decodedText.trim()
+        );
+
+
+    if (!item) {
+
+        showError(
+            "Item not found. This QR code does not belong to an inventory item."
+        );
+
+        return;
+
+    }
+
+
+    scannedItem = item;
+
+
+    displayItem(item);
+
+}
+
+
+/* =====================================
+   DISPLAY ITEM
+===================================== */
+
+function displayItem(item) {
+
+    document.getElementById(
+        "errorMessage"
+    ).style.display = "none";
+
+
+    document.getElementById(
+        "itemResult"
+    ).style.display = "block";
+
+
+    document.getElementById(
+        "resultId"
+    ).textContent =
+        item.id;
+
+
+    document.getElementById(
+        "resultName"
+    ).textContent =
+        item.name;
+
+
+    document.getElementById(
+        "resultCategory"
+    ).textContent =
+        item.category;
+
+
+    document.getElementById(
+        "resultQuantity"
+    ).textContent =
+        item.quantity;
+
+
+    document.getElementById(
+        "resultLocation"
+    ).textContent =
+        item.location;
+
+
+    const status =
+        document.getElementById(
+            "resultStatus"
+        );
+
+
+    status.textContent =
+        item.status;
+
+
+    status.className =
+        "status";
+
+
+    if (item.status === "Available") {
+
+        status.classList.add(
+            "status-available"
+        );
+
+    }
+
+
+    else if (
+        item.status === "Borrowed"
+    ) {
+
+        status.classList.add(
+            "status-borrowed"
+        );
+
+    }
+
+
+    else {
+
+        status.classList.add(
+            "status-maintenance"
+        );
+
+    }
+
+
+    const button =
+        document.getElementById(
+            "borrowButton"
+        );
+
+
+    if (
+        item.status !== "Available"
+    ) {
+
+        button.disabled = true;
+
+        button.textContent =
+            "Item Not Available";
+
+    }
+
+    else {
+
+        button.disabled = false;
+
+        button.textContent =
+            "Request to Borrow";
+
+    }
+
+}
+
+
+/* =====================================
+   ERROR
+===================================== */
+
+function showError(message) {
+
+    const error =
+        document.getElementById(
+            "errorMessage"
+        );
+
+
+    error.textContent =
+        message;
+
+
+    error.style.display =
+        "block";
+
+}
+
+
+/* =====================================
+   REQUEST BORROW
+===================================== */
+
+function requestBorrow() {
+
+    if (!scannedItem) {
+
+        return;
+
+    }
+
+
+    if (
+        scannedItem.status !== "Available"
+    ) {
+
+        alert(
+            "This item is not available."
+        );
+
+        return;
+
+    }
+
+
+    let requests =
+        JSON.parse(
+            localStorage.getItem(
+                "borrowRequests"
+            )
+        ) || [];
+
+
+    const alreadyRequested =
+        requests.some(
+            request =>
+                request.itemId === scannedItem.id &&
+                request.username === user.username &&
+                request.status === "Pending"
+        );
+
+
+    if (alreadyRequested) {
+
+        alert(
+            "You already have a pending request for this item."
+        );
+
+        return;
+
+    }
+
+
+    const request = {
+
+        id:
+            "REQ-" +
+            Date.now(),
+
+        itemId:
+            scannedItem.id,
+
+        itemName:
+            scannedItem.name,
+
+        username:
+            user.username,
+
+        borrowerName:
+            user.name,
+
+        requestDate:
+            new Date().toISOString(),
+
+        status:
+            "Pending"
+
+    };
+
+
+    requests.push(request);
+
+
+    localStorage.setItem(
+        "borrowRequests",
+        JSON.stringify(requests)
+    );
+
+
+    alert(
+        "Borrow request submitted successfully."
+    );
+
+
+    document.getElementById(
+        "borrowButton"
+    ).disabled = true;
+
+
+    document.getElementById(
+        "borrowButton"
+    ).textContent =
+        "Request Pending";
+
+}
+
+
+/* =====================================
+   QR SCANNER
+===================================== */
+
+const scanner =
+    new Html5QrcodeScanner(
+
+        "reader",
+
+        {
+
+            fps: 10,
+
+            qrbox: {
+                width: 250,
+                height: 250
+            }
+
+        },
+
+        false
+
+    );
+
+
+scanner.render(
+    onScanSuccess
+);
+
+
+/* =====================================
+   LOGOUT
+===================================== */
+
+function logout() {
+
+    localStorage.removeItem(
+        "inventoryUser"
+    );
+
+}
+
+</script>
+
+
+</body>
+
+</html>
