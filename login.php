@@ -68,23 +68,15 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             $role = strtolower(trim($user['role']));
 
 
-            if (
-                $role === 'admin' ||
-                $role === 'administrator'
-            ) {
+            if ($role === 'admin' || $role === 'administrator') {
 
-                header("Location: admin/dashboard.php");
-                exit;
+                  header("Location: admin/dashboard.php");
+                    exit;
 
-            }
+}
 
-
-            /*
-             * Normal user / staff.
-             */
-
-            header("Location: borrower/dashboard.php");
-            exit;
+                header("Location: borrower/dashboard.php");
+                    exit;
 
         } else {
 
