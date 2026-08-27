@@ -1,0 +1,353 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>My Borrowed Items - Inventory System</title>
+
+    <link rel="stylesheet" href="../assets/css/style.css">
+
+    <style>
+        .content-card {
+            background: white;
+            border: 1px solid #e4ebe6;
+            border-radius: 14px;
+            padding: 25px;
+            margin-bottom: 25px;
+        }
+
+        .status {
+            display: inline-block;
+            padding: 5px 10px;
+            border-radius: 20px;
+            font-size: 12px;
+            font-weight: 600;
+        }
+
+        .status-borrowed {
+            background: #fff3cd;
+            color: #856404;
+        }
+
+        .status-returned {
+            background: #d1e7dd;
+            color: #0f5132;
+        }
+
+        .status-overdue {
+            background: #f8d7da;
+            color: #842029;
+        }
+
+        .empty-message {
+            text-align: center;
+            padding: 35px;
+            color: #718078;
+        }
+
+        .info-box {
+            background: #f7faf8;
+            border-left: 4px solid #198754;
+            padding: 15px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+            color: #536158;
+        }
+    </style>
+
+</head>
+
+<body>
+
+<div class="app-layout">
+
+    <!-- SIDEBAR -->
+
+    <aside class="sidebar">
+
+        <div class="sidebar-logo">
+
+            <div class="logo-icon">
+                📦
+            </div>
+
+            <div>
+                <h2>Inventory</h2>
+                <p>Management System</p>
+            </div>
+
+        </div>
+
+
+        <nav class="sidebar-nav">
+
+            <a href="dashboard.html" class="nav-link">
+                <span class="nav-icon">📊</span>
+                <span>Dashboard</span>
+            </a>
+
+            <a href="../qr/scan.html" class="nav-link">
+                <span class="nav-icon">📷</span>
+                <span>Scan QR Code</span>
+            </a>
+
+            <a href="borrow.html" class="nav-link">
+                <span class="nav-icon">📦</span>
+                <span>My Borrowed Items</span>
+            </a>
+
+            <a href="history.html" class="nav-link">
+                <span class="nav-icon">📋</span>
+                <span>Transaction History</span>
+            </a>
+
+            <a
+                href="../index.html"
+                class="nav-link logout-link"
+                onclick="logout()"
+            >
+                <span class="nav-icon">🚪</span>
+                <span>Logout</span>
+            </a>
+
+        </nav>
+
+    </aside>
+
+
+    <!-- MAIN -->
+
+    <main class="main-content">
+
+        <div class="page-header">
+
+            <div>
+
+                <h1>
+                    My Borrowed Items
+                </h1>
+
+                <p>
+                    Items currently assigned to you.
+                </p>
+
+            </div>
+
+        </div>
+
+
+        <div class="content-card">
+
+            <div class="info-box">
+
+                📌 Items shown here are items that have
+                been approved by the administrator and
+                are currently borrowed by you.
+
+            </div>
+
+
+            <div class="table-container">
+
+                <table class="data-table">
+
+                    <thead>
+
+                        <tr>
+
+                            <th>
+                                Item
+                            </th>
+
+                            <th>
+                                Borrowed Date
+                            </th>
+
+                            <th>
+                                Status
+                            </th>
+
+                        </tr>
+
+                    </thead>
+
+
+                    <tbody id="borrowedTable">
+
+                    </tbody>
+
+                </table>
+
+            </div>
+
+        </div>
+
+    </main>
+
+</div>
+
+
+<script>
+
+/* =====================================
+   LOGIN CHECK
+===================================== */
+
+const user =
+    JSON.parse(
+        localStorage.getItem("inventoryUser")
+    );
+
+
+if (!user) {
+
+    window.location.href =
+        "../index.html";
+
+}
+
+
+/* =====================================
+   LOAD TRANSACTIONS
+===================================== */
+
+const transactions =
+    JSON.parse(
+        localStorage.getItem(
+            "transactions"
+        )
+    ) || [];
+
+
+/* =====================================
+   GET USER'S BORROWED ITEMS
+===================================== */
+
+const borrowedItems =
+    transactions.filter(
+        function(transaction) {
+
+            return (
+                transaction.username ===
+                user.username &&
+
+                transaction.status ===
+                "Borrowed"
+            );
+
+        }
+    );
+
+
+/* =====================================
+   DISPLAY
+===================================== */
+
+const table =
+    document.getElementById(
+        "borrowedTable"
+    );
+
+
+if (borrowedItems.length === 0) {
+
+    table.innerHTML = `
+
+        <tr>
+
+            <td
+                colspan="3"
+                class="empty-message"
+            >
+
+                <strong>
+                    You don't have any borrowed items.
+                </strong>
+
+                <br><br>
+
+                Scan an item's QR code if you
+                want to request something.
+
+            </td>
+
+        </tr>
+
+    `;
+
+}
+
+
+else {
+
+    borrowedItems.forEach(
+        function(item) {
+
+            const date =
+                new Date(
+                    item.borrowedDate
+                ).toLocaleString();
+
+
+            table.innerHTML += `
+
+                <tr>
+
+                    <td>
+
+                        <strong>
+                            ${item.itemName}
+                        </strong>
+
+                        <br>
+
+                        <small>
+                            Item ID:
+                            ${item.itemId}
+                        </small>
+
+                    </td>
+
+                    <td>
+                        ${date}
+                    </td>
+
+                    <td>
+
+                        <span
+                            class="status status-borrowed"
+                        >
+                            Borrowed
+                        </span>
+
+                    </td>
+
+                </tr>
+
+            `;
+
+        }
+    );
+
+}
+
+
+/* =====================================
+   LOGOUT
+===================================== */
+
+function logout() {
+
+    localStorage.removeItem(
+        "inventoryUser"
+    );
+
+}
+
+</script>
+
+</body>
+
+</html>
