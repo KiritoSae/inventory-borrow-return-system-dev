@@ -5,15 +5,9 @@ requireLogin();
 
 require_once __DIR__ . '/../config/database.php';
 
-
 if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
-
-    header(
-        "Location: ../admin/inventory.php"
-    );
-
+    header("Location: ../admin/inventory.php");
     exit;
-
 }
 
 
@@ -23,18 +17,15 @@ $transactionId = filter_input(
     FILTER_VALIDATE_INT
 );
 
-
 $itemId = filter_input(
     INPUT_POST,
     'item_id',
     FILTER_VALIDATE_INT
 );
 
-
 $returnCondition = trim(
     $_POST['return_condition'] ?? ''
 );
-
 
 $returnRemarks = trim(
     $_POST['return_remarks'] ?? ''
@@ -46,11 +37,9 @@ if (
     !$itemId ||
     $returnCondition === ''
 ) {
-
     die(
         "Transaction, item, and return condition are required."
     );
-
 }
 
 
@@ -60,33 +49,25 @@ try {
 
 
     /*
-     * Find the active transaction.
+     * Find active transaction.
      */
-
     $stmt = $pdo->prepare("
         SELECT
             id,
             item_id,
             status
         FROM transactions
-
         WHERE id = ?
-
         AND item_id = ?
-
         AND status = 'Borrowed'
-
         LIMIT 1
-
         FOR UPDATE
     ");
-
 
     $stmt->execute([
         $transactionId,
         $itemId
     ]);
-
 
     $transaction = $stmt->fetch(
         PDO::FETCH_ASSOC
@@ -103,18 +84,20 @@ try {
 
 
     /*
-     * Update the transaction.
+     * Update transaction.
      */
-
     $updateTransaction = $pdo->prepare("
         UPDATE transactions
 
         SET
-            return_date = NOW(),
-            return_condition = ?,
-            return_remarks = ?,
-            status = 'Returned',
-            returned_by = ?
+            returned_date = NOW(),
+            condition_after = ?,
+            remarks = CASE
+                WHEN ? = '' THEN remarks
+                WHEN remarks IS NULL OR remarks = '' THEN ?
+                ELSE CONCAT(remarks, '\nReturn: ', ?)
+            END,
+            status = 'Returned'
 
         WHERE id = ?
     ");
@@ -124,9 +107,11 @@ try {
 
         $returnCondition,
 
-        $returnRemarks ?: null,
+        $returnRemarks,
 
-        $_SESSION['user_id'],
+        $returnRemarks,
+
+        $returnRemarks,
 
         $transactionId
 
@@ -134,9 +119,8 @@ try {
 
 
     /*
-     * Make the inventory item available again.
+     * Make item available again.
      */
-
     $updateItem = $pdo->prepare("
         UPDATE items
 
@@ -148,12 +132,9 @@ try {
     ");
 
 
-    $newItemCondition = $returnCondition;
-
-
     $updateItem->execute([
 
-        $newItemCondition,
+        $returnCondition,
 
         $itemId
 
@@ -173,17 +154,13 @@ try {
 } catch (Exception $e) {
 
     if ($pdo->inTransaction()) {
-
         $pdo->rollBack();
-
     }
 
 
     die(
         "Return failed: " .
-        htmlspecialchars(
-            $e->getMessage()
-        )
+        htmlspecialchars($e->getMessage())
     );
-
 }
+?>
