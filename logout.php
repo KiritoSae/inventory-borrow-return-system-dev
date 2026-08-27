@@ -2,16 +2,11 @@
 
 session_start();
 
-/*
- * Remove all session variables.
- */
+/* Clear all session data */
 $_SESSION = [];
 
-
-/*
- * Delete the session cookie.
- */
-if (ini_get("session.use_cookies")) {
+/* Remove the session cookie */
+if (ini_get('session.use_cookies')) {
 
     $params = session_get_cookie_params();
 
@@ -19,24 +14,16 @@ if (ini_get("session.use_cookies")) {
         session_name(),
         '',
         time() - 42000,
-        $params["path"],
-        $params["domain"],
-        $params["secure"],
-        $params["httponly"]
+        $params['path'],
+        $params['domain'],
+        $params['secure'],
+        $params['httponly']
     );
 }
 
-
-/*
- * Destroy the session.
- */
+/* Destroy the session */
 session_destroy();
 
-
-/*
- * Return to login.
- */
-header("Location: login.php");
+/* Go back to login */
+header('Location: login.php');
 exit;
-
-?>
