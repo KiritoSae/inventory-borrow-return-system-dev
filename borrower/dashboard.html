@@ -1,0 +1,700 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>My Dashboard - Inventory System</title>
+
+    <link rel="stylesheet" href="../assets/css/style.css">
+
+    <style>
+        .content-card {
+            background: white;
+            border: 1px solid #e4ebe6;
+            border-radius: 14px;
+            padding: 25px;
+            margin-bottom: 25px;
+        }
+
+        .user-cards {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 18px;
+            margin-bottom: 25px;
+        }
+
+        .dashboard-card {
+            background: white;
+            border-radius: 14px;
+            padding: 22px;
+            border: 1px solid #e4ebe6;
+        }
+
+        .dashboard-card h3 {
+            font-size: 13px;
+            color: #748078;
+            margin-bottom: 10px;
+        }
+
+        .dashboard-card .number {
+            font-size: 28px;
+            font-weight: bold;
+            color: #173c29;
+        }
+
+        .dashboard-card.success {
+            border-left: 5px solid #198754;
+        }
+
+        .dashboard-card.warning {
+            border-left: 5px solid #dc3545;
+        }
+
+        .status {
+            display: inline-block;
+            padding: 5px 10px;
+            border-radius: 20px;
+            font-size: 12px;
+            font-weight: 600;
+        }
+
+        .status-pending {
+            background: #fff3cd;
+            color: #856404;
+        }
+
+        .status-borrowed {
+            background: #fff3cd;
+            color: #856404;
+        }
+
+        .status-returned {
+            background: #d1e7dd;
+            color: #0f5132;
+        }
+
+        .status-rejected {
+            background: #f8d7da;
+            color: #842029;
+        }
+
+        .scan-button {
+            display: inline-block;
+            padding: 13px 20px;
+            border-radius: 9px;
+            background: #198754;
+            color: white;
+            text-decoration: none;
+            font-weight: 600;
+        }
+
+        .scan-button:hover {
+            background: #146c43;
+        }
+
+        .empty-message {
+            text-align: center;
+            padding: 30px;
+            color: #718078;
+        }
+
+        @media (max-width: 700px) {
+            .user-cards {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+
+</head>
+
+<body>
+
+<div class="app-layout">
+
+    <!-- SIDEBAR -->
+
+    <aside class="sidebar">
+
+        <div class="sidebar-logo">
+
+            <div class="logo-icon">
+                📦
+            </div>
+
+            <div>
+                <h2>Inventory</h2>
+                <p>Management System</p>
+            </div>
+
+        </div>
+
+
+        <nav class="sidebar-nav">
+
+            <a href="dashboard.html" class="nav-link">
+                <span class="nav-icon">📊</span>
+                <span>Dashboard</span>
+            </a>
+
+            <a href="../qr/scan.html" class="nav-link">
+                <span class="nav-icon">📷</span>
+                <span>Scan QR Code</span>
+            </a>
+
+            <a href="borrow.html" class="nav-link">
+                <span class="nav-icon">📦</span>
+                <span>My Borrowed Items</span>
+            </a>
+
+            <a href="history.html" class="nav-link">
+                <span class="nav-icon">📋</span>
+                <span>Transaction History</span>
+            </a>
+
+            <a
+                href="../index.html"
+                class="nav-link logout-link"
+                onclick="logout()"
+            >
+                <span class="nav-icon">🚪</span>
+                <span>Logout</span>
+            </a>
+
+        </nav>
+
+    </aside>
+
+
+    <!-- MAIN -->
+
+    <main class="main-content">
+
+        <div class="page-header">
+
+            <div>
+
+                <h1>
+                    My Dashboard
+                </h1>
+
+                <p>
+                    Welcome back,
+                    <span id="userName">
+                        User
+                    </span>.
+                </p>
+
+            </div>
+
+        </div>
+
+
+        <!-- QUICK ACTION -->
+
+        <div class="content-card">
+
+            <h2>
+                Borrow an Item
+            </h2>
+
+            <p style="color:#718078; margin:8px 0 18px;">
+                Scan the QR code attached to an inventory item
+                to view its information and request to borrow it.
+            </p>
+
+            <a
+                href="../qr/scan.html"
+                class="scan-button"
+            >
+                📷 Scan QR Code
+            </a>
+
+        </div>
+
+
+        <!-- STATISTICS -->
+
+        <div class="user-cards">
+
+
+            <div class="dashboard-card success">
+
+                <h3>
+                    Currently Borrowed
+                </h3>
+
+                <div
+                    class="number"
+                    id="borrowedCount"
+                >
+                    0
+                </div>
+
+            </div>
+
+
+            <div class="dashboard-card">
+
+                <h3>
+                    Pending Requests
+                </h3>
+
+                <div
+                    class="number"
+                    id="pendingCount"
+                >
+                    0
+                </div>
+
+            </div>
+
+
+            <div class="dashboard-card warning">
+
+                <h3>
+                    Overdue
+                </h3>
+
+                <div
+                    class="number"
+                    id="overdueCount"
+                >
+                    0
+                </div>
+
+            </div>
+
+
+        </div>
+
+
+        <!-- CURRENT BORROWED ITEMS -->
+
+        <div class="content-card">
+
+            <h2 style="margin-bottom:20px;">
+                My Borrowed Items
+            </h2>
+
+
+            <div class="table-container">
+
+                <table class="data-table">
+
+                    <thead>
+
+                        <tr>
+
+                            <th>
+                                Item
+                            </th>
+
+                            <th>
+                                Borrowed Date
+                            </th>
+
+                            <th>
+                                Status
+                            </th>
+
+                        </tr>
+
+                    </thead>
+
+
+                    <tbody id="borrowedTable">
+
+                    </tbody>
+
+                </table>
+
+            </div>
+
+        </div>
+
+
+        <!-- RECENT REQUESTS -->
+
+        <div class="content-card">
+
+            <h2 style="margin-bottom:20px;">
+                Recent Requests
+            </h2>
+
+
+            <div class="table-container">
+
+                <table class="data-table">
+
+                    <thead>
+
+                        <tr>
+
+                            <th>
+                                Request ID
+                            </th>
+
+                            <th>
+                                Item
+                            </th>
+
+                            <th>
+                                Date
+                            </th>
+
+                            <th>
+                                Status
+                            </th>
+
+                        </tr>
+
+                    </thead>
+
+
+                    <tbody id="requestsTable">
+
+                    </tbody>
+
+                </table>
+
+            </div>
+
+        </div>
+
+
+    </main>
+
+</div>
+
+
+<script>
+
+/* =====================================
+   LOGIN CHECK
+===================================== */
+
+const user =
+    JSON.parse(
+        localStorage.getItem("inventoryUser")
+    );
+
+
+if (!user) {
+
+    window.location.href =
+        "../index.html";
+
+}
+
+
+/* =====================================
+   DISPLAY USER
+===================================== */
+
+document.getElementById(
+    "userName"
+).textContent =
+    user.name;
+
+
+/* =====================================
+   LOAD DATA
+===================================== */
+
+const requests =
+    JSON.parse(
+        localStorage.getItem(
+            "borrowRequests"
+        )
+    ) || [];
+
+
+const transactions =
+    JSON.parse(
+        localStorage.getItem(
+            "transactions"
+        )
+    ) || [];
+
+
+/* =====================================
+   USER REQUESTS
+===================================== */
+
+const myRequests =
+    requests.filter(
+        request =>
+            request.username ===
+            user.username
+    );
+
+
+/* =====================================
+   USER TRANSACTIONS
+===================================== */
+
+const myTransactions =
+    transactions.filter(
+        transaction =>
+            transaction.username ===
+            user.username
+    );
+
+
+/* =====================================
+   COUNTS
+===================================== */
+
+const borrowed =
+    myTransactions.filter(
+        transaction =>
+            transaction.status ===
+            "Borrowed"
+    );
+
+
+const overdue =
+    myTransactions.filter(
+        transaction =>
+            transaction.status ===
+            "Overdue"
+    );
+
+
+const pending =
+    myRequests.filter(
+        request =>
+            request.status ===
+            "Pending"
+    );
+
+
+document.getElementById(
+    "borrowedCount"
+).textContent =
+    borrowed.length;
+
+
+document.getElementById(
+    "pendingCount"
+).textContent =
+    pending.length;
+
+
+document.getElementById(
+    "overdueCount"
+).textContent =
+    overdue.length;
+
+
+/* =====================================
+   BORROWED ITEMS
+===================================== */
+
+const borrowedTable =
+    document.getElementById(
+        "borrowedTable"
+    );
+
+
+if (borrowed.length === 0) {
+
+    borrowedTable.innerHTML = `
+
+        <tr>
+
+            <td
+                colspan="3"
+                class="empty-message"
+            >
+
+                You currently have no borrowed items.
+
+            </td>
+
+        </tr>
+
+    `;
+
+}
+
+
+else {
+
+    borrowed.forEach(
+        function(transaction) {
+
+            const date =
+                new Date(
+                    transaction.borrowedDate
+                ).toLocaleDateString();
+
+
+            borrowedTable.innerHTML += `
+
+                <tr>
+
+                    <td>
+
+                        <strong>
+                            ${transaction.itemName}
+                        </strong>
+
+                        <br>
+
+                        <small>
+                            ${transaction.itemId}
+                        </small>
+
+                    </td>
+
+                    <td>
+                        ${date}
+                    </td>
+
+                    <td>
+
+                        <span class="status status-borrowed">
+                            ${transaction.status}
+                        </span>
+
+                    </td>
+
+                </tr>
+
+            `;
+
+        }
+    );
+
+}
+
+
+/* =====================================
+   REQUEST HISTORY
+===================================== */
+
+const requestsTable =
+    document.getElementById(
+        "requestsTable"
+    );
+
+
+if (myRequests.length === 0) {
+
+    requestsTable.innerHTML = `
+
+        <tr>
+
+            <td
+                colspan="4"
+                class="empty-message"
+            >
+
+                You haven't submitted any requests yet.
+
+            </td>
+
+        </tr>
+
+    `;
+
+}
+
+
+else {
+
+    myRequests
+        .slice()
+        .reverse()
+        .forEach(
+            function(request) {
+
+                const date =
+                    new Date(
+                        request.requestDate
+                    ).toLocaleDateString();
+
+
+                let statusClass =
+                    "status-pending";
+
+
+                if (
+                    request.status ===
+                    "Approved"
+                ) {
+
+                    statusClass =
+                        "status-returned";
+
+                }
+
+
+                if (
+                    request.status ===
+                    "Rejected"
+                ) {
+
+                    statusClass =
+                        "status-rejected";
+
+                }
+
+
+                requestsTable.innerHTML += `
+
+                    <tr>
+
+                        <td>
+                            ${request.id}
+                        </td>
+
+                        <td>
+                            ${request.itemName}
+                        </td>
+
+                        <td>
+                            ${date}
+                        </td>
+
+                        <td>
+
+                            <span
+                                class="status ${statusClass}"
+                            >
+                                ${request.status}
+                            </span>
+
+                        </td>
+
+                    </tr>
+
+                `;
+
+            }
+        );
+
+}
+
+
+/* =====================================
+   LOGOUT
+===================================== */
+
+function logout() {
+
+    localStorage.removeItem(
+        "inventoryUser"
+    );
+
+}
+
+</script>
+
+
+</body>
+
+</html>
