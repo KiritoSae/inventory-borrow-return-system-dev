@@ -1,0 +1,690 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+
+    <meta charset="UTF-8">
+
+    <meta
+        name="viewport"
+        content="width=device-width, initial-scale=1.0"
+    >
+
+    <title>Transactions - Inventory System</title>
+
+    <link
+        rel="stylesheet"
+        href="../assets/css/style.css"
+    >
+
+    <style>
+
+        .content-card {
+            background: white;
+            border: 1px solid #e4ebe6;
+            border-radius: 14px;
+            padding: 25px;
+        }
+
+        .status {
+            display: inline-block;
+            padding: 5px 10px;
+            border-radius: 20px;
+            font-size: 12px;
+            font-weight: 600;
+        }
+
+        .status-borrowed {
+            background: #fff3cd;
+            color: #856404;
+        }
+
+        .status-returned {
+            background: #d1e7dd;
+            color: #0f5132;
+        }
+
+        .status-overdue {
+            background: #f8d7da;
+            color: #842029;
+        }
+
+        .btn {
+            border: none;
+            border-radius: 7px;
+            padding: 8px 12px;
+            cursor: pointer;
+            font-weight: 600;
+            font-size: 13px;
+        }
+
+        .btn-return {
+            background: #198754;
+            color: white;
+        }
+
+        .btn-return:hover {
+            background: #146c43;
+        }
+
+        .empty-message {
+            text-align: center;
+            padding: 30px;
+            color: #718078;
+        }
+
+    </style>
+
+</head>
+
+
+<body>
+
+
+<div class="app-layout">
+
+
+    <!-- SIDEBAR -->
+
+    <aside class="sidebar">
+
+        <div class="sidebar-logo">
+
+            <div class="logo-icon">
+                📦
+            </div>
+
+            <div>
+
+                <h2>
+                    Inventory
+                </h2>
+
+                <p>
+                    Management System
+                </p>
+
+            </div>
+
+        </div>
+
+
+        <nav class="sidebar-nav">
+
+            <a href="dashboard.html">
+                📊 Dashboard
+            </a>
+
+            <a href="inventory.html">
+                📦 Inventory
+            </a>
+
+            <a href="borrowers.html">
+                👥 Borrowers
+            </a>
+
+            <a href="departments.html">
+                🏢 Departments
+            </a>
+
+            <a href="../qr/generate.html">
+                🔳 QR Codes
+            </a>
+
+            <a href="../qr/scan.html">
+                📷 QR Scanner
+            </a>
+
+            <a href="requests.html">
+                📥 Borrow Requests
+            </a>
+
+            <a href="transactions.html">
+                📋 Transactions
+            </a>
+
+            <a
+                href="../index.html"
+                onclick="logout()"
+            >
+                🚪 Logout
+            </a>
+
+        </nav>
+
+    </aside>
+
+
+    <!-- MAIN -->
+
+    <main class="main-content">
+
+
+        <div class="page-header">
+
+            <div>
+
+                <h1>
+                    Transactions
+                </h1>
+
+                <p>
+                    View borrowing and return transactions.
+                </p>
+
+            </div>
+
+        </div>
+
+
+        <div class="content-card">
+
+            <h2 style="margin-bottom:20px;">
+                Transaction History
+            </h2>
+
+
+            <div class="table-container">
+
+                <table class="data-table">
+
+                    <thead>
+
+                        <tr>
+
+                            <th>
+                                Transaction ID
+                            </th>
+
+                            <th>
+                                Item
+                            </th>
+
+                            <th>
+                                Borrower
+                            </th>
+
+                            <th>
+                                Borrowed Date
+                            </th>
+
+                            <th>
+                                Return Date
+                            </th>
+
+                            <th>
+                                Status
+                            </th>
+
+                            <th>
+                                Action
+                            </th>
+
+                        </tr>
+
+                    </thead>
+
+
+                    <tbody id="transactionsTable">
+
+                    </tbody>
+
+                </table>
+
+            </div>
+
+        </div>
+
+
+    </main>
+
+</div>
+
+
+<script>
+
+/* =====================================
+   ADMIN CHECK
+===================================== */
+
+const user =
+    JSON.parse(
+        localStorage.getItem("inventoryUser")
+    );
+
+
+if (
+    !user ||
+    user.role !== "admin"
+) {
+
+    window.location.href =
+        "../index.html";
+
+}
+
+
+/* =====================================
+   LOAD DATA
+===================================== */
+
+let transactions =
+    JSON.parse(
+        localStorage.getItem(
+            "transactions"
+        )
+    ) || [];
+
+
+let items =
+    JSON.parse(
+        localStorage.getItem(
+            "inventoryItems"
+        )
+    ) || [];
+
+
+const table =
+    document.getElementById(
+        "transactionsTable"
+    );
+
+
+/* =====================================
+   CREATE TRANSACTIONS FROM APPROVED
+   REQUESTS
+===================================== */
+
+function synchronizeTransactions() {
+
+    const requests =
+        JSON.parse(
+            localStorage.getItem(
+                "borrowRequests"
+            )
+        ) || [];
+
+
+    requests.forEach(
+        function(request) {
+
+            if (
+                request.status !==
+                "Approved"
+            ) {
+
+                return;
+
+            }
+
+
+            const exists =
+                transactions.some(
+                    transaction =>
+                        transaction.requestId ===
+                        request.id
+                );
+
+
+            if (exists) {
+
+                return;
+
+            }
+
+
+            const transaction = {
+
+                id:
+                    "TRX-" +
+                    Date.now() +
+                    "-" +
+                    Math.floor(
+                        Math.random() * 1000
+                    ),
+
+                requestId:
+                    request.id,
+
+                itemId:
+                    request.itemId,
+
+                itemName:
+                    request.itemName,
+
+                borrowerName:
+                    request.borrowerName,
+
+                username:
+                    request.username,
+
+                borrowedDate:
+                    request.approvedDate ||
+                    new Date().toISOString(),
+
+                returnDate:
+                    null,
+
+                status:
+                    "Borrowed"
+
+            };
+
+
+            transactions.push(
+                transaction
+            );
+
+        }
+    );
+
+
+    localStorage.setItem(
+        "transactions",
+        JSON.stringify(
+            transactions
+        )
+    );
+
+}
+
+
+/* =====================================
+   DISPLAY TRANSACTIONS
+===================================== */
+
+function displayTransactions() {
+
+    table.innerHTML = "";
+
+
+    if (
+        transactions.length === 0
+    ) {
+
+        table.innerHTML = `
+
+            <tr>
+
+                <td
+                    colspan="7"
+                    class="empty-message"
+                >
+
+                    No transactions yet.
+
+                </td>
+
+            </tr>
+
+        `;
+
+        return;
+
+    }
+
+
+    transactions.forEach(
+        function(transaction, index) {
+
+
+            let statusClass =
+                "status-borrowed";
+
+
+            if (
+                transaction.status ===
+                "Returned"
+            ) {
+
+                statusClass =
+                    "status-returned";
+
+            }
+
+
+            if (
+                transaction.status ===
+                "Overdue"
+            ) {
+
+                statusClass =
+                    "status-overdue";
+
+            }
+
+
+            const borrowedDate =
+                transaction.borrowedDate
+                    ? new Date(
+                        transaction.borrowedDate
+                    ).toLocaleString()
+                    : "-";
+
+
+            const returnDate =
+                transaction.returnDate
+                    ? new Date(
+                        transaction.returnDate
+                    ).toLocaleString()
+                    : "-";
+
+
+            let action = "";
+
+
+            if (
+                transaction.status ===
+                "Borrowed"
+            ) {
+
+                action = `
+
+                    <button
+                        class="btn btn-return"
+                        onclick="returnItem(${index})"
+                    >
+                        Return Item
+                    </button>
+
+                `;
+
+            }
+
+            else {
+
+                action =
+                    "<span>Completed</span>";
+
+            }
+
+
+            table.innerHTML += `
+
+                <tr>
+
+                    <td>
+                        ${transaction.id}
+                    </td>
+
+                    <td>
+
+                        <strong>
+                            ${transaction.itemName}
+                        </strong>
+
+                        <br>
+
+                        <small>
+                            ${transaction.itemId}
+                        </small>
+
+                    </td>
+
+                    <td>
+
+                        ${transaction.borrowerName}
+
+                        <br>
+
+                        <small>
+                            ${transaction.username}
+                        </small>
+
+                    </td>
+
+                    <td>
+                        ${borrowedDate}
+                    </td>
+
+                    <td>
+                        ${returnDate}
+                    </td>
+
+                    <td>
+
+                        <span
+                            class="status ${statusClass}"
+                        >
+                            ${transaction.status}
+                        </span>
+
+                    </td>
+
+                    <td>
+                        ${action}
+                    </td>
+
+                </tr>
+
+            `;
+
+        }
+    );
+
+}
+
+
+/* =====================================
+   RETURN ITEM
+===================================== */
+
+function returnItem(index) {
+
+    const transaction =
+        transactions[index];
+
+
+    if (!transaction) {
+
+        return;
+
+    }
+
+
+    if (
+        !confirm(
+            "Confirm that this item has been returned?"
+        )
+    ) {
+
+        return;
+
+    }
+
+
+    /* -------------------------------
+       UPDATE TRANSACTION
+    ------------------------------- */
+
+    transaction.status =
+        "Returned";
+
+
+    transaction.returnDate =
+        new Date().toISOString();
+
+
+    transaction.returnedBy =
+        user.username;
+
+
+    /* -------------------------------
+       UPDATE INVENTORY
+    ------------------------------- */
+
+    const itemIndex =
+        items.findIndex(
+            item =>
+                item.id ===
+                transaction.itemId
+        );
+
+
+    if (
+        itemIndex !== -1
+    ) {
+
+        items[itemIndex].status =
+            "Available";
+
+    }
+
+
+    /* -------------------------------
+       SAVE DATA
+    ------------------------------- */
+
+    localStorage.setItem(
+        "transactions",
+        JSON.stringify(
+            transactions
+        )
+    );
+
+
+    localStorage.setItem(
+        "inventoryItems",
+        JSON.stringify(
+            items
+        )
+    );
+
+
+    displayTransactions();
+
+
+    alert(
+        "Item successfully returned."
+    );
+
+}
+
+
+/* =====================================
+   LOGOUT
+===================================== */
+
+function logout() {
+
+    localStorage.removeItem(
+        "inventoryUser"
+    );
+
+}
+
+
+/* =====================================
+   START
+===================================== */
+
+synchronizeTransactions();
+
+displayTransactions();
+
+</script>
+
+
+</body>
+
+</html>
