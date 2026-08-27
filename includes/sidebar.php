@@ -34,6 +34,9 @@
         <a href="/reports/">
             Reports
         </a>
+        <a href="../logout.php">
+            Logout
+        </a>
 
     </nav>
 
