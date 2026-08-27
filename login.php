@@ -18,7 +18,13 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     } else {
 
         $stmt = $pdo->prepare("
-            SELECT id, full_name, username, password, role, status
+            SELECT
+                id,
+                full_name,
+                username,
+                password,
+                role,
+                status
             FROM users
             WHERE username = ?
             LIMIT 1
@@ -28,20 +34,56 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
         $user = $stmt->fetch(PDO::FETCH_ASSOC);
 
+
         if (
             $user &&
             $user['status'] === 'Active' &&
             password_verify($password, $user['password'])
         ) {
 
+            /*
+             * Prevent session fixation.
+             */
             session_regenerate_id(true);
 
+
+            /*
+             * Store authenticated user information.
+             */
             $_SESSION['user_id'] = $user['id'];
+
             $_SESSION['full_name'] = $user['full_name'];
+
+            $_SESSION['user_name'] = $user['full_name'];
+
             $_SESSION['username'] = $user['username'];
+
             $_SESSION['role'] = $user['role'];
 
-            header("Location: admin/dashboard.php");
+
+            /*
+             * Redirect according to account role.
+             */
+
+            $role = strtolower(trim($user['role']));
+
+
+            if (
+                $role === 'admin' ||
+                $role === 'administrator'
+            ) {
+
+                header("Location: admin/dashboard.php");
+                exit;
+
+            }
+
+
+            /*
+             * Normal user / staff.
+             */
+
+            header("Location: borrower/dashboard.php");
             exit;
 
         } else {
@@ -97,6 +139,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
             </div>
 
+
             <?php if ($error): ?>
 
                 <div style="
@@ -107,7 +150,9 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                     margin-bottom:20px;
                     font-size:14px;
                 ">
+
                     <?= htmlspecialchars($error) ?>
+
                 </div>
 
             <?php endif; ?>
