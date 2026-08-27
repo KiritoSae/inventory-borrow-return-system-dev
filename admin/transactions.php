@@ -7,6 +7,15 @@ requireLogin();
 require_once __DIR__ . '/../config/database.php';
 
 
+// Automatically update overdue transactions
+$pdo->query("
+    UPDATE transactions
+    SET status = 'Overdue'
+    WHERE status = 'Borrowed'
+      AND due_date < NOW()
+");
+
+
 // ==============================
 // SEARCH & FILTERS
 // ==============================
